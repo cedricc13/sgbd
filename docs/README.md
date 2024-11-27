@@ -12,7 +12,7 @@ L'application permet de consulter des informations sur les camions, les chauffeu
 
 Voici le diagramme de modélisation des données (Entité-Association) du projet.
 
-![Schéma Entité-Association](images/schemamentite.png)  
+![Schéma Entité-Association](images/SGBD-PROJET.png)  
 
 > **Note :** Ce schéma représente les principales entités (camions, chauffeurs, dépôts, produits, livraisons) ainsi que leurs associations (par exemple, un chauffeur peut conduire plusieurs camions, un camion peut transporter plusieurs produits, etc.).
 
