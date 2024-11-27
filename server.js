@@ -4,6 +4,7 @@ const { Pool } = require('pg');  //Pour psql
 const app = express();
 const port = 8080;
 
+console.log('Connecté à la base de données PostgreSQL');
 
 app.use(express.json());
 
@@ -19,11 +20,14 @@ app.use(express.static('public'));
 
 //Recup les données du .env
 const pool = new Pool({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-  port: process.env.DB_PORT,
+  user: process.env.PG_USER,
+  host: process.env.PG_HOST,
+  database: process.env.PG_DATABASE,
+  password: process.env.PG_PASSWORD,
+  port: process.env.PG_PORT,
+  ssl: {
+    rejectUnauthorized: false  // Permet de désactiver la vérification SSL
+  }
 });
 
 // Test si psql est accessible
