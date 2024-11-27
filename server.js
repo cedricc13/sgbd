@@ -2,7 +2,8 @@ require('dotenv').config();
 const express = require('express');
 const { Pool } = require('pg');  //Pour psql
 const app = express();
-const port = 8080;
+const port = process.env.PORT || 8080;
+
 
 console.log('Connecté à la base de données PostgreSQL');
 
@@ -556,7 +557,7 @@ app.post('/api/contenirAdd', async (req, res) => {
 
 
 app.listen(port, () => {
-  console.log(`Serveur lancé sur http://localhost:${port}`);
+  console.log(`Serveur démarré sur le port ${port}`);
 });
 
 
