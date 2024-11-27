@@ -17,7 +17,7 @@ app.use((req, res, next) => {
 
 
 //Pour que ca utilise les sources styles et scipts au bon endroit 
-app.use(express.static('public'));
+app.use(express.static('docs'));
 
 //Recup les données du .env
 const pool = new Pool({
