@@ -1,0 +1,31 @@
+MARQUE: marque_id, nom_marque
+FABRIQUER, 0N MARQUE, 11 MODELE
+MODELE: modele_id, nom_modèle
+APPARTENIR, 0N MODELE, 0N CAMION
+CAMION: camion_id, immatriculation,type,date mise service, date achat, kilometrage, capacite, etat
+CONDUIRE, 0N CHAUFFEUR, 1N CAMION
+:
+
+:
+:
+:
+TRAJET: id trajet, distance, numero_depot_1, numero_depot_2
+LIVRER, 11 LIVRAISON, 0N CAMION, 0N CHAUFFEUR
+CHAUFFEUR: chauffeur_id, nom_chauffeur, prenom_chauffeur, adresse_avec_ville, date_embauche, type_permis, rendement, absence, respect_code
+:
+
+:
+:
+:
+PARCOURIR, 0N TRAJET, 11 LIVRAISON
+LIVRAISON: id livraison, statut_livraison
+CONTENIR, 1N LIVRAISON, 0N PRODUIT: quantité
+PRODUIT: code produit, poids
+
+:
+:
+:
+PARTIR, 11 LIVRAISON, 0N DEPOT :  date prévue, date effective
+DEPOT: numéro dépôt, intitulé_depot, ville
+ARRIVER, 11 LIVRAISON, 0N DEPOT :  date prévue, date effective
+:

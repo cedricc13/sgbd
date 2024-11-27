@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion Logistique</title>
+    <!-- client principal-->
+    <script src="scripts/client.js" defer></script>
+    <!-- script pour le readmenpage d'acceuil-->
+    <script src="https://cdn.jsdelivr.net/npm/marked@4.0.12/marked.min.js" defer></script>
+    <!-- client pour les requetes avancées-->
+    <script src="scripts/clientadvancedrequests.js" defer></script>
+    <link rel="stylesheet" href="styles/styles.css">
+    <link rel="stylesheet" href="styles/stylestables.css">
+
+    
+</head>
+<body onload="showSection('sectionaccueuil')">
+
+<!-- Menu latéral -->
+<nav>
+    <h3 id="menu" onclick="showSection('sectionaccueuil')">MENU</h2>
+    <a href="#" onclick="showSection('sectionchauffeur')"  class='bouton' id="boutonchauffeurs"> <span class="button-text"> Chauffeurs</span></a>
+    <a href="#" onclick="showSection('sectioncamion')"  class='bouton' id="boutoncamions"> <span class="button-text"> Camions</span> </a> 
+    <a href="#" onclick="showSection('sectionlivraison')" class='bouton'  id="boutonlivraisons"> <span class="button-text"> Livraisons</span></a>
+    <a href="#" onclick="showSection('sectiondepot')" class='bouton'  id="boutondepots"> <span class="button-text"n> Depots</span> </a>
+    <a href="#" onclick="showSection('sectionproduit')"  class='bouton' id="boutonproduits"> <span class="button-text"> Produits</span>  </a>
+    <a href="#" onclick="showSection('sectioninfraction')"  class='bouton' id="boutoninfractions"> <span class="button-text"> Infractions</span></a>
+    <a href="#" onclick="showSection('sectionabsence')" class='bouton'  id="boutonabsences"> <span class="button-text"> Absence</span>  </a>
+    <a href="#" onclick="showSection('sectionrequetesavancees')"  class='bouton' id="boutonrequetesavancees"> <span class="button-text"> Requetes avancées </span></a>
+    
+    <div id="smallbuttoncontainer">
+        <a href="#" class="bouton smallbouton" id="moretablesbutton" onclick="showSection('sectionmoretables')"> <span class="button-text">plus de tables</span> </a>
+        <a href="#" class="bouton smallbouton" id="creditsbutton" onclick="showSection('sectioncredits')"> <span class="button-text">Crédits</span>  </a>
+        <a href="#" class="bouton smallbouton" id="?button" onclick="showSection('section?')"> <span class="button-text">?</span> </a>
+    </div>
+</nav>
+
+<!-- Contenu principal -->
+<main>
+
+    <!-- Section Accueuil-->
+     <div id="sectionaccueuil" class="section hidden">
+        <h3>BIENVENUE SUR L'INTERFACE GRAPHIQUE DU PROJET SBGD </h3>
+            <div class="markdown-content" id="content"></div>
+            <script>
+                // Utiliser Fetch pour récupérer le fichier markdown et le convertir en HTML
+                fetch('README.md')
+                    .then(response => response.text())
+                    .then(data => {
+                        // Utiliser Marked.js pour convertir le Markdown en HTML
+                        const htmlContent = marked.parse(data);  // Utilisez .parse() dans la version récente de marked.js
+                        document.getElementById('content').innerHTML = htmlContent;
+                    })
+                    .catch(err => {
+                        console.error('Erreur lors de la récupération du fichier markdown:', err);
+                    });
+            </script>
+     </div>
+
+    <!-- Section Chauffeurs -->
+    <div id="sectionchauffeur" class="section hidden">
+        <h3>CHAUFFEURS</h3>
+        <h2>Affichage</h2>
+
+        <div class="container">
+            <div class="selectioncontainer souscontainer">
+                <h4>Sélectionner les attributs à afficher</h4>
+                <form id="chauffeur-attributs-form">
+                    <!-- Case à cocher "Tout sélectionner" -->
+                    <label><input type="checkbox" id="selectAllchauffeur" /> Tout sélectionner</label><br>
+
+                    <label><input  type="checkbox" name="nom_chauffeur" /> Nom du Chauffeur</label><br>
+                    <label><input  type="checkbox" name="prenom_chauffeur" /> Prénom du Chauffeur</label><br>
+                    <label><input type="checkbox" name="adresse_avec_ville" /> Adresse</label><br>
+                    <label><input type="checkbox" name="date_embauche" /> Date d'embauche</label><br>
+                    <label><input type="checkbox" name="type_permis" /> Type de permis</label><br>
+                </form>
+                <button type="button" onclick="displayTable('chauffeur')">Afficher</button>
+            </div>
+            
+            <div class="listcontainer souscontainer tablesql">
+                <h4>Liste des Chauffeurs</h4>
+                <div id="chauffeur-list" class="list"></div>
+            </div>
+        </div>
+
+        <h2>Insertion</h2>
+        <div class="container souscontainer">
+            <div class='inputcontainer'> 
+                <div class="inputzone">
+                    <label for="nom_chauffeur">Nom </label>
+                    <input type="text" id="nom_chauffeur" placeholder="Nom">
+                    <label for="prenom_chauffeur">Prenom</label>
+                    <input type="text" id="prenom_chauffeur" placeholder="Prénom">
+                    <label for="adresse_avec_ville">Adresse (avecville)</label>
+                    <input type="text" id="adresse_avec_ville" placeholder="Adresse">
+                    <label for="date_embauche">Date d'embauche</label>
+                    <input type="date" id="date_embauche" placeholder="Date d'embauche">
+                    <label for="type_permis">Type de permis</label>
+                    <input type="text" id="type_permis" placeholder="Type de permis">
+                </div>
+                    <button onclick="addChauffeur()">Ajouter Chauffeur</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Section Camions -->
+    <div id="sectioncamion" class="section hidden">
+        <h3>CAMIONS</h3>
+        <h2>Affichage</h2>
+        
+        <div class="container">
+            <div class="selectioncontainer souscontainer">
+                <h4>Sélectionner les attributs à afficher</h4>
+                <form id="camion-attributs-form">
+                    <!-- Case à cocher "Tout sélectionner" -->
+                    <label><input type="checkbox" id="selectAllcamion" /> Tout sélectionner</label><br>
+
+                    <label><input type="checkbox" name="immatriculation" /> Immatriculation</label><br>
+                    <label><input type="checkbox" name="type" /> Type de Camion</label><br>
+                    <label><input type="checkbox" name="date_mise_service" /> Date de Mise en Service</label><br>
+                    <label><input type="checkbox" name="date_achat" /> Date d'Achat</label><br>
+                    <label><input type="checkbox" name="kilometrage" /> Kilométrage</label><br>
+                    <label><input type="checkbox" name="capacite" /> Capacité</label><br>
+                    <label><input type="checkbox" name="etat" /> État</label><br>
+                </form>
+                <button type="button" onclick="displayTable('camion')">Afficher</button>
+            </div>
+
+            <div class="listcontainer souscontainer tablesql">
+                <h4>Liste des Camions</h4>
+                <div id="camion-list" class="list"></div>
+            </div>
+        </div>
+        
+        <h2>Insertion</h2>
+        <div class="container souscontainer">
+            <div class='inputcontainer'> 
+                <div class="inputzone"> 
+                    <label for="immatriculation">Immatriculation</label>
+                    <input type="text" id="immatriculation" placeholder="Immatriculation">
+                    <label for="type">Type du camion</label>
+                    <input type="text" id="type" placeholder="Type de Camion">
+                    <label for="date_mise_service">Date de mise en service</label>
+                    <input type="date" id="date_mise_service" placeholder="Date de Mise en Service">
+                    <label for="date_achat">Date d'achat</label>
+                    <input type="date" id="date_achat" placeholder="Date d'Achat">
+                    <label for="kilometrage">Kilometrage</label>
+                    <input type="number" id="kilometrage" placeholder="Kilométrage">
+                    <label for="capacite">Capacité</label>
+                    <input type="number" id="capacite" placeholder="Capacité">
+                    <label for="etat">Etat du camion </label>
+                    <input type="text" id="etat" placeholder="État">
+                </div>
+                <button onclick="addCamion()">Ajouter Camion</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Section Livraison -->
+    <div id="sectionlivraison" class="section hidden">
+        <h3>LIVRAISONS</h3>
+        <h2>Affichage</h2>
+
+        <div class="container">
+            <div class="selectioncontainer souscontainer">
+                <h4>Sélectionner les attributs à afficher</h4>
+                <form id="livraison-attributs-form">
+                    <label><input type="checkbox" id="selectAlllivraison" /> Tout sélectionner</label><br>
+
+                    <label><input type="checkbox" name="statut_livraison" /> Statut de Livraison</label><br>
+                    <label><input type="checkbox" name="camion_id" /> Camion</label><br>
+                    <label><input type="checkbox" name="chauffeur_id" /> Chauffeur</label><br>
+                    <label><input type="checkbox" name="date_prevue_depart" /> Dépot de départ</label><br>
+                    <label><input type="checkbox" name="date_prevue_depart" /> Date prévue de départ</label><br>
+                    <label><input type="checkbox" name="date_effective_depart" /> Date effective de départ</label><br>
+                    <label><input type="checkbox" name="date_prevue_depart" /> Dépot d'arrivée</label><br>
+                    <label><input type="checkbox" name="date_prevue_arrivee" /> Date prévue d'arrivée</label><br>
+                    <label><input type="checkbox" name="date_effective_arrivee" /> Date effective d'arrivée</label><br>
+                </form>
+                <button type="button" onclick="displayTable('livraison')">Afficher</button>
+            </div>
+
+            <div class="listcontainer souscontainer tablesql">
+                <h4>Liste des Livraisons</h4>
+                <div id="livraison-list" class="list"></div>
+            </div>
+        </div>
+        
+        <h2>Insertion</h2>
+        <div class="container souscontainer">
+            <div class="inputcontainer"> 
+                <div class="inputzone"> 
+                    <label for="statut_livraison">Statut de la livraisons</label>
+                    <input type="text" id="statut_livraison" placeholder="Statut de Livraison">
+                    <label for="chauffeur_id_sel_1">Chauffeur:</label>
+                    <select id="chauffeur_id_sel_1">
+                        <option value="">Sélectionnez un chauffeur</option>
+                    </select>
+                    
+                    <label for="camion_id_sel_1">Camion:</label>
+                    <select id="camion_id_sel_1">
+                        <option value="">Sélectionnez un camion</option>
+                    </select>
+
+                    <label for="depot_depart_id_sel">Depot de depart</label>
+                    <select id="depot_depart_id_sel">
+                        <option value="">Sélectionnez un depot de depart</option>
+                    </select>
+
+                    <label for="date_prevue_depart">Date prévue de départ</label>
+                    <input type="datetime-local" id="date_prevue_depart" placeholder="Date prévue de départ">
+                    <label for="date_effective_depart">Date effective de départ</label>
+                    <input type="datetime-local" id="date_effective_depart" placeholder="Date effective de départ">
+
+                    <label for="depot_arrivee_id_sel">Depot d'arrivée</label>
+                    <select id="depot_arrivee_id_sel">
+                        <option value="">Sélectionnez un depot d'arrivee </option>
+                    </select>
+                    <label for="date_effective_arrivee">Date effective d'arrivee</label>
+                    <input type="datetime-local" id="date_prevue_arrivee" placeholder="Date prévue d'arrivée">
+                    <label for="date_effective_arrivee">Date effective d'arrivee</label>
+                    <input type="datetime-local" id="date_effective_arrivee" placeholder="Date effective d'arrivée">
+                </div>
+                <button onclick="addLivraison()">Ajouter Livraison</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Section Depot -->
+    <div id="sectiondepot" class="section hidden">
+        <h3>DEPOTS</h3>
+        <h2>Affichage</h2>
+
+        <div class="container">
+            <div class="selectioncontainer souscontainer">
+                <h4>Sélectionner les attributs à afficher</h4>
+                <form id="depot-attributs-form">
+                    <label><input type="checkbox" id="selectAlldepot" /> Tout sélectionner</label><br>
+
+                    <label><input type="checkbox" name="intitule_depot" /> Intitulé de Dépôt</label><br>
+                    <label><input type="checkbox" name="ville" /> Ville</label><br>
+                </form>
+                <button type="button" onclick="displayTable('depot')">Afficher</button>
+            </div>
+
+            <div class="listcontainer souscontainer tablesql">
+                <h4>Liste des Depots</h4>
+                <div id="depot-list" class="list"></div>
+            </div>
+        </div>
+        
+        <h2>Insertion</h2>
+        <div class="container souscontainer">
+            <div class="inputcontainer">
+                <div class="inputzone">
+                    <label for="intitule_depot">Intitulé du Dépôt</label>
+                        <input type="text" id="intitule_depot" placeholder="Intitulé du Dépôt">
+                    
+            
+                    <label for="ville">Ville</label>
+                        <input type="text" id="ville" placeholder="Ville">
+                    
+                </div>
+                <button onclick="addDepot()">Ajouter Dépôt</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Section Produit -->
+    <div id="sectionproduit" class="section hidden">
+        <h3>PRODUITS</h3>
+        <h2>Affichage</h2>
+
+        <div class="container">
+            <div class="selectioncontainer souscontainer">
+                <h4>Sélectionner les attributs à afficher</h4>
+                <form id="produit-attributs-form">
+                    <label><input type="checkbox" id="selectAllproduit" /> Tout sélectionner</label><br>
+
+                    <label><input type="checkbox" name="produit_id" /> Id du Produit</label><br>
+                    <label><input type="checkbox" name="nom_produit" /> Nom du Produit</label><br>
+                    <label><input type="checkbox" name="poids" /> Poids (kg)</label><br>
+                </form>
+                <button type="button" onclick="displayTable('produit')">Afficher</button>
+            </div>
+
+            <div class="listcontainer souscontainer tablesql">
+                <h4>Liste des Produits</h4>
+                <div id="produit-list" class="list"></div>
+            </div>
+        </div>
+        
+        <h2>Insertion</h2>
+        <div class="container souscontainer">
+                <div class = 'inputcontainer'>
+                    <div class="inputzone">
+                        <label for="nom_produit">Nom du Produit</label>
+                            <input type="text" id="nom_produit" placeholder="Nom du Produit">
+                        
+                
+                        <label for="poids">Poids</label>
+                            <input type="number" id="poids" placeholder="Poids">
+                        
+                    </div>
+                    <button onclick="addProduit()">Ajouter Produit</button>
+                </div>
+        </div>
+    </div>
+
+    
+    <!-- Section Infractions -->
+    <div id="sectioninfraction" class="section hidden">
+        <h3>INFRACTIONS</h3>
+        <h2>Affichage</h2>
+
+        <div class="container">
+            <div class="selectioncontainer souscontainer">
+                <h4>Sélectionner les attributs à afficher</h4>
+                <form id="infraction-attributs-form">
+                    <label><input type="checkbox" id="selectAllinfraction" /> Tout sélectionner</label><br>
+                    <label><input type="checkbox" name="date_infraction" /> Date d'Infraction</label><br>
+                    <label><input type="checkbox" name="type_infraction" /> Type d'Infraction</label><br>
+                    <label><input type="checkbox" name="chauffeur_id" /> Id du chauffeur</label><br> 
+                </form>
+                <button type="button" onclick="displayTable('infraction')">Afficher</button>
+            </div>
+
+            <div class="listcontainer souscontainer tablesql">
+                <h4>Liste des Infractions</h4>
+                <div id="infraction-list" class="list"></div>
+            </div>
+        </div>
+        
+        <h2>Insertion</h2>
+        <div class="container souscontainer">
+            <div class="inputcontainer">
+                <div class="inputzone">
+                    <label for="date_infraction">Date d'Infraction</label>
+                        <input type="date" id="date_infraction" placeholder="Date d'Infraction">
+                    
+
+                    <label for="type_infraction">Type d'Infraction</label>
+                        <input type="text" id="type_infraction" placeholder="Type d'Infraction">
+                    
+
+                    <label for="chauffeur_id_sel_2">Id du Chauffeur</label>
+                        <select id="chauffeur_id_sel_2">
+                            <option value="">Sélectionnez un chauffeur</option>
+                        </select>
+                    
+                </div>
+                <button onclick="addInfraction()">Ajouter Infraction</button>
+            </div>
+        </div>
+    </div>
+
+
+    
+   <!-- Section Absences -->
+    <div id="sectionabsence" class="section hidden">
+        <h3>ABSENCES</h3>
+        <h2>Affichage</h2>
+
+        <div class="container">
+            <div class="selectioncontainer souscontainer">
+                <h4>Sélectionner les attributs à afficher</h4>
+                <form id="absence-attributs-form">
+                    <label><input type="checkbox" id="selectAllabsence" /> Tout sélectionner</label><br>
+                    <label><input type="checkbox" name="chauffeur_id" /> Id du chauffeur</label><br>
+                    <label><input type="checkbox" name="date_debut" /> Date de Début</label><br>
+                    <label><input type="checkbox" name="date_fin" /> Date de Fin</label><br>
+                </form>
+                <button type="button" onclick="displayTable('absence')">Afficher</button>
+            </div>
+
+            <div class="listcontainer souscontainer tablesql">
+                <h4>Liste des Absences</h4>
+                <div id="absence-list" class="list"></div>
+            </div>
+        </div>
+        
+            <h2>Insertion</h2>
+            <div class="container souscontainer">
+                <div class = 'inputcontainer'>
+                    <div class="inputzone">
+                        <label for="date_debut">Date de Début</label>
+                            <input type="date" id="date_debut" placeholder="Date de Début">
+                        
+                    
+                        <label for="date_fin">Date de Fin</label>
+                            <input type="date" id="date_fin" placeholder="Date de Fin">
+                        
+                    
+                        <label for="chauffeur_id_sel_3">Id du Chauffeur</label>
+                            <select id="chauffeur_id_sel_3">
+                                <option value="">Sélectionnez un chauffeur</option>
+                            </select>
+                        
+                    </div>
+                    <button onclick="addAbsence()">Ajouter Absence</button>
+                </div>
+            </div>
+    </div>
+
+     <!-- Section requetes avancées --> 
+     <div id="sectionrequetesavancees" class="section hidden">
+        
+        <h3>REQUETES AVANCEES</h3>
+        <h2>Construisez Votre propre requête</h2>
+        <div class="advancedrequestscontainer">
+        <div class="container">
+            <div class="requestselcontainer">
+                SELECT 
+                <div id="column-checkbox-container">
+                    attributs
+                    <!-- Cases à cocher pour les colonnes seront ajoutées ici -->
+                </div>
+                FROM
+                <select id="table-select" onchange="handleTableChange()">
+                    <option value="">Sélectionnez une table</option>
+                    <option value="crossJoin">Produit Cartésien</option>
+                </select>
+
+                
+                <div id="cross-join-container" style="display:none;">
+                    <select id="table1-select" onchange="updateCrossJoinPreview()">
+                        <!-- Options de tables ajoutées dynamiquement -->
+                    </select>
+                    X
+                    <select id="table2-select" onchange="updateCrossJoinPreview()">
+                        <!-- Options de tables ajoutées dynamiquement -->
+                    </select>
+                </div>
+                WHERE
+                <select id="column-select" onchange="handleColumnChange()" disabled>
+                    <option value="">Selectionnez colonne</option>
+                </select>
+                <select id="operator-select" onchange="updateQueryPreview()" disabled>
+                
+                </select>
+
+                <div id="value-container">
+                    <select id="value-select" disabled onchange="handleValueSelectChange()">
+                    
+                    </select>
+                    
+                    <!-- Zone de saisie pour la valeur -->
+                    <div id="value-input-container" style="display:none;" onchange="updateQueryPreview()">
+                        <input type="text" id="input-value" placeholder="Entrez une valeur" />
+                    </div>
+                </div>
+            
+            </div>
+            <h4>Votre requête SQL : </h4>
+            <div class="requestpreviewcontainer"> 
+                <div class="builtrequestcontainer">
+                    <p id="query-preview"></p>
+                    
+                </div>
+                <button onclick="executeQuery()">Exécuter la Requête</button>
+            </div>
+        </div>
+        <div class="listcontainer souscontainer tablesql">
+            <h4>Table des résultats :</h4>
+            <div id="resultat-list" class="list"></div>
+        </div>
+    </div>
+</div>
+
+
+
+
+    
+
+    <!-- Sections Plus de tables-->
+    <div id="sectionmoretables" class="section hidden">
+        <div id="sectionmarque" class="soussection">
+            <h3>MARQUES</h3>
+            <h2>Affichage</h2>
+                <div class="container">
+                    <div class="selectioncontainer souscontainer">
+                        <h4>Sélectionner les attributs à afficher</h4>
+                        <form id="marque-attributs-form">
+                            <label><input type="checkbox" id="selectAllmarque" /> Tout sélectionner</label><br>
+                            <label><input type="checkbox" name="marque_id" /> Id de la marque</label><br>
+                            <label><input type="checkbox" name="nom_marque" /> Nom de la marque</label><br>
+                        </form>
+                        <button type="button" onclick="displayTable('marque')">Afficher</button>
+                    </div>
+
+                    <div class="listcontainer souscontainer tablesql">
+                        <h4>Liste des Marques</h4>
+                        <div id="marque-list" class="list"> </div>
+                    </div>
+                </div>
+            
+            <h2>Insertion</h2>
+            <div class="container souscontainer">
+                <div class = 'inputcontainer'>
+                    <div class="inputzone">
+                        <label for="nom_marque">Nom de la marque</label>
+                            <input type="text" id="nom_marque" placeholder="Nom de la Marque">                    
+                    </div>
+                    <button onclick="addMarque()">Ajouter Marque</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="sectionmodele" class="soussection">
+            <h3>MODELES</h3>
+            <h2>Affichage</h2>
+            <div class="container">
+                <div class="selectioncontainer souscontainer">
+                    <h4>Sélectionner les attributs à afficher</h4>
+                    <form id="modele-attributs-form">
+                        <label><input type="checkbox" id="selectAllmodele" /> Tout sélectionner</label><br>
+                        <label><input type="checkbox" name="modele_id" /> Id du modèle</label><br>
+                        <label><input type="checkbox" name="nom_modele" /> Nom du modèle</label><br>
+                        <label><input type="checkbox" name="marque_id" /> Marque</label><br>
+                    </form>
+                    <button type="button" onclick="displayTable('modeles')">Afficher</button>
+                </div>
+        
+                <div class="listcontainer souscontainer tablesql">
+                    <h4>Liste des Modèles</h4>
+                    <div id="modele-list" class="list"></div>
+                </div>
+            </div>
+        
+            <h2>Insertion</h2>
+            <div class="container souscontainer">
+                <div class="inputcontainer">
+                    <div class="inputzone">
+                        <label for="nom_modele">Nom du Modèle</label>
+                        <input type="text" id="nom_modele" placeholder="Nom du modèle">
+                        <label for="marque_id">Marque</label>
+                        <select id="marque_id_sel">
+                            <option value="">Sélectionnez une marque</option>
+                        </select>
+                    </div>
+                    <button onclick="addModele()">Ajouter Modèle</button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="sectionappartenir" class="soussection">
+            <h3>APPARTENIR</h3>
+            <h2>Affichage</h2>
+            <div class="container">
+                <div class="selectioncontainer souscontainer">
+                    <h4>Sélectionner les attributs à afficher</h4>
+                    <form id="appartenir-attributs-form">
+                        <label><input type="checkbox" id="selectAllappartenir" /> Tout sélectionner</label><br>
+                        <label><input type="checkbox" name="modele_id" /> Id du modèle</label><br>
+                        <label><input type="checkbox" name="camion_id" /> Id du camion</label><br>
+                    </form>
+                    <button type="button" onclick="displayTable('appartenir')">Afficher</button>
+                </div>
+        
+                <div class="listcontainer souscontainer tablesql">
+                    <h4>Liste des Appartenir</h4>
+                    <div id="appartenir-list" class="list"></div>
+                </div>
+            </div>
+        
+            <h2>Insertion</h2>
+            <div class="container souscontainer">
+                <div class="inputcontainer">
+                    <div class="inputzone">
+                        <label for="modele_id_sel">Modèle</label>
+                        <select id="modele_id_sel">
+                            <option value="">Sélectionnez un modèle</option>
+                            <!-- Modele options will be populated dynamically -->
+                        </select>
+                        <label for="camion_id_sel_2">Camion</label>
+                        <select id="camion_id_sel_2">
+                            <option value="">Sélectionnez un camion
+                            </option>
+                            <!-- Camion options will be populated dynamically -->
+                        </select>
+                    </div>
+                    <button onclick="addAppartenir()">Ajouter Appartenance</button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="sectionconduire" class="soussection">
+            <h3>CONDUIRE</h3>
+            <h2>Affichage</h2>
+            <div class="container">
+                <div class="selectioncontainer souscontainer">
+                    <h4>Sélectionner les attributs à afficher</h4>
+                    <form id="conduire-attributs-form">
+                        <label><input type="checkbox" id="selectAllconduire" /> Tout sélectionner</label><br>
+                        <label><input type="checkbox" name="chauffeur_id" /> Id du chauffeur</label><br>
+                        <label><input type="checkbox" name="camion_id" /> Id du camion</label><br>
+                    </form>
+                    <button type="button" onclick="displayTable('conduire')">Afficher</button>
+                </div>
+        
+                <div class="listcontainer souscontainer tablesql">
+                    <h4>Liste des Conducteurs</h4>
+                    <div id="conduire-list" class="list"></div>
+                </div>
+            </div>
+        
+            <h2>Insertion</h2>
+            <div class="container souscontainer">
+                <div class="inputcontainer">
+                    <div class="inputzone">
+                        <label for="chauffeur_id_sel_4">Chauffeur</label>
+                        <select id="chauffeur_id_sel_4">
+                            <option value="">Sélectionnez un chauffeur</option>
+                            <!-- Chauffeur options will be populated dynamically -->
+                        </select>
+                        <label for="camion_id_sel_3">Camion</label>
+                        <select id="camion_id_sel_3">
+                            <option value="">Sélectionnez un camion</option>
+                            <!-- Camion options will be populated dynamically -->
+                        </select>
+                    </div>
+                    <button onclick="addConduire()">Ajouter Conducteur</button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="sectiondistance" class="soussection">
+            <h3>DISTANCE</h3>
+            <h2>Affichage</h2>
+            <div class="container">
+                <div class="selectioncontainer souscontainer">
+                    <h4>Sélectionner les attributs à afficher</h4>
+                    <form id="distance-attributs-form">
+                        <label><input type="checkbox" id="selectAlldistance" /> Tout sélectionner</label><br>
+                        <label><input type="checkbox" name="depot1_id" /> Dépôt 1</label><br>
+                        <label><input type="checkbox" name="depot2_id" /> Dépôt 2</label><br>
+                        <label><input type="checkbox" name="distance" /> Distance</label><br>
+                    </form>
+                    <button type="button" onclick="displayTable('distance')">Afficher</button>
+                </div>
+        
+                <div class="listcontainer souscontainer tablesql">
+                    <h4>Liste des Distances</h4>
+                    <div id="distance-list" class="list"></div>
+                </div>
+            </div>
+        
+            <h2>Insertion</h2>
+            <div class="container souscontainer">
+                <div class="inputcontainer">
+                    <div class="inputzone">
+                        <label for="depot_id_sel_1">Dépôt 1</label>
+                        <select id="depot_id_sel_1">
+                            <option value="">Sélectionnez un dépôt</option>
+                            <!-- Depot options will be populated dynamically -->
+                        </select>
+                        <label for="depot_id_sel_2">Dépôt 2</label>
+                        <select id="depot_id_sel_2">
+                            <option value="">Sélectionnez un dépôt</option>
+                            <!-- Depot options will be populated dynamically -->
+                        </select>
+                        <label for="distance">Distance</label>
+                        <input type="number" id="distance" placeholder="Distance en km">
+                    </div>
+                    <button onclick="addDistance()">Ajouter Distance</button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="sectioncontenir" class="soussection">
+            <h3>CONTENIR</h3>
+            <h2>Affichage</h2>
+            <div class="container">
+                <div class="selectioncontainer souscontainer">
+                    <h4>Sélectionner les attributs à afficher</h4>
+                    <form id="contenir-attributs-form">
+                        <label><input type="checkbox" id="selectAllcontenir" /> Tout sélectionner</label><br>
+                        <label><input type="checkbox" name="livraison_id" /> Id de la livraison</label><br>
+                        <label><input type="checkbox" name="produit_id" /> Id du produit</label><br>
+                        <label><input type="checkbox" name="quantite" /> Quantité</label><br>
+                    </form>
+                    <button type="button" onclick="displayTable('contenir')">Afficher</button>
+                </div>
+        
+                <div class="listcontainer souscontainer tablesql">
+                    <h4>Liste des Contenir</h4>
+                    <div id="contenir-list" class="list"></div>
+                </div>
+            </div>
+        
+            <h2>Insertion</h2>
+            <div class="container souscontainer">
+                <div class="inputcontainer">
+                    <div class="inputzone">
+                        <label for="livraison_id_sel">Livraison</label>
+                        <select id="livraison_id_sel">
+                            <option value="">Sélectionnez une livraison</option>
+                            <!-- Livraison options will be populated dynamically -->
+                        </select>
+                        <label for="produit_id_sel">Produit</label>
+                        <select id="produit_id_sel">
+                            <option value="">Sélectionnez un produit</option>
+                            <!-- Produit options will be populated dynamically -->
+                        </select>
+                        <label for="quantite">Quantité</label>
+                        <input type="number" id="quantite" placeholder="Quantité">
+                    </div>
+                    <button onclick="addContenir()">Ajouter Contenir</button>
+                </div>
+            </div>
+        </div>
+        
+        
+
+    </div>
+
+    <div id="sectioncredits" class="section hidden">
+        <h3>CREDITS</h2>
+        
+    </div>
+
+    <div id="section?" class="section hidden">
+        <h3>?</h2>
+        
+    </div>
+    
+</main>
+
+</body>
+</html>

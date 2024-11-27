@@ -1,0 +1,349 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    background-color: rgba(69,91,255,0.69);
+}
+
+main {
+    margin-left: 260px;
+    padding: 0px 0px 0px 25px;
+    width: calc(100% - 220px);
+}
+
+
+h3 {
+    display: block;
+    width: 103%;
+    color: yellow;
+    font-size: 25px;
+    font-weight: bold;
+    height: 30px;
+    background-size: cover;
+    text-align: center;
+    text-shadow: 0px 0px 2px black;
+    margin-top: 0px;
+    margin-left: -26px;
+    background-color: #152498;
+    box-shadow: 10px 10px 5px 0px #15249871;
+    padding-bottom: 8px;
+    padding-top: 8px;
+    border: solid 0.5px yellow; 
+}
+
+#menu {
+    padding: 0px 0px 0px 0px;
+    box-shadow: none;
+    margin-left: 0px;
+    margin-top: 8px;
+    margin-bottom: 27px;
+    height: 15px;
+    width: 100%;
+    border: none;
+    cursor: pointer;
+    background-color: #00000000;
+}
+
+#menu:hover {
+    transform: scale(1.1);
+    text-shadow: 0px 0px 10px rgba(255, 255, 0, 0.605);
+}
+
+nav {
+    width: 260px;
+    background-color: #152498;
+    color: white;
+    height: 100vh;
+    position: fixed;
+    box-shadow: 10px 10px 5px 0px #15249871;
+    border: solid 0.5px yellow; 
+    z-index: 2;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+    display: block;
+    padding: 10px;
+    height: 65px;
+    border :solid black 1px; 
+    display: flex;         
+    justify-content: center;
+    align-items: center;  
+}
+
+nav a:hover {
+    background-color: #34495e;
+}
+
+.section {
+    width: 1160px; 
+    margin: 0 auto;
+    padding: 0;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+}
+
+h2 {
+    text-shadow: 5px 5px 5px rgba(44, 44, 44, 0.443);
+}
+.hidden {
+    display: none;
+}
+
+#boutonchauffeurs {
+    background-image: url('../images/chauffeur.jpeg');
+}
+#boutoncamions {
+    background-image: url('../images/camions.jpeg');
+}
+#boutonlivraisons {
+    background-image: url('../images/livraisons.jpeg');
+}
+#boutondepots {
+    background-image: url('../images/depot.avif');
+}
+#boutonproduits {
+    background-image: url('../images/produits.jpeg');
+}
+#boutoninfractions {
+    background-image: url('../images/infractions.jpeg');
+}
+#boutonabsences {
+    background-image: url('../images/absence.jpeg');
+}
+#boutonrequetesavancees {
+    background-image: url('../images/requetesavancees.jpeg');
+}
+
+#creditsbutton {
+    background-image: url('../images/credits.png');
+}
+
+#moretablesbutton {
+    background-image: url('../images/voirplus.avif');
+}
+
+
+button {
+    position: relative;
+    padding: 10px 20px;
+    cursor: pointer;
+    overflow: hidden; 
+    color: black ;
+    margin: 10px auto;
+    display: block;
+    transition: transform 0.3s ease;
+    background-color: lightgray;
+    box-sizing: border-box;
+    height: min-content
+  }
+  
+
+button:hover {
+    box-shadow: 2px 2px 0px 0px #263bd593;
+    background-color: rgb(150, 148, 148);
+}
+
+
+
+.bouton {
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: relative;
+    display: inline-block;
+    overflow: hidden; 
+    justify-content: center;
+    align-items: center;
+    width: 200px;
+    height: 65px;
+    transition: transform 0.3s ease;
+    box-shadow: 12px 12px 0px 0px #263bd593;
+    margin: 0px 0px 0px 15px; 
+    border: solid 0.5px yellow; 
+}
+
+
+a > span {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;               
+    height: 100%;              
+    display: flex;          
+    justify-content: center;
+    align-items: center;
+    opacity: 0; 
+    background-color: rgba(255, 4, 4, 0);
+
+
+    color: #2840f5;
+    font-weight: bold;
+    font-size: 20px;   
+    transition: background-color 0.3s, opacity 0.3s;
+    text-shadow: 0px 0px 3px rgb(255, 255, 255);
+
+}
+
+.bouton:hover .button-text {
+    opacity: 1;                              
+    background-color: rgba(255, 255, 0, 0.526)   
+}
+
+.bouton:hover {
+    transform: scale(1.1);
+    box-shadow: 10px 10px 0px 0px rgba(255, 255, 0, 0.485);
+}
+
+.smallbouton {
+    width: 45px;
+    height: 27px;
+    margin-right: -8px;
+    margin-top: 1px;
+}
+
+.container {
+    display: flex;
+}
+
+.souscontainer {
+    display: flex;
+    flex-direction: column;
+}
+
+.inputcontainer {
+    display: flex;
+    align-items: center;
+}
+
+.inputzone {
+    display: flex;
+    flex-direction: column;
+    width: 70%; 
+    padding-left: 21px;
+} 
+
+.markdown-content img {
+    max-width: 100%;      
+    height: auto;         
+    display: block;       
+    margin: 0 auto;       
+}
+
+h4 {
+    text-align: center;
+}
+
+
+.selectioncontainer {
+    display: flex;
+    flex-direction: column; 
+    justify-content: space-between; 
+    align-items: center; 
+    padding: 20px; 
+}
+
+.selectioncontainer h4 {
+    margin: 0; 
+    align-self: flex-start; 
+}
+
+.selectioncontainer form {
+    flex: 1; 
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly; 
+    align-items: flex-start; 
+    margin-top: 30px;
+}
+
+.selectioncontainer button {
+    align-self: center; 
+    margin-top: 20px; 
+}
+
+input, select {
+    margin-bottom: 10px;
+    border: solid 1px yellow;
+    background-color: rgba(211, 211, 211, 0.588);
+}
+
+input::placeholder {
+    color: rgb(107, 107, 105); 
+    opacity: 0.7; 
+}
+
+.soussection {
+    margin-bottom: 20px;
+}
+
+#moretablesbutton > span {
+    font-size: 15px;
+    text-align: center;
+    justify-content: center;
+}
+
+#creditsbutton > span {
+    font-size: 15px;
+    text-align: center;
+    justify-content: center;
+}
+
+#sectionrequetesavancees > .container {
+    display: flex;
+    flex-direction: column;
+}
+
+.builtrequestcontainer {
+    border: solid 1px yellow;
+    padding: 0px 0px 0px 15px;
+    border-radius: 5px;
+    box-shadow: 6px 6px 0px rgba(51, 49, 49, 0.58);
+    width: 70%;
+    background-color: rgba(211, 211, 211, 0.561);
+    height: 5Opx;
+}
+
+#sectionrequetesavancees h4 {
+    text-align: left;
+}
+
+.requestpreviewcontainer {
+    display: flex;
+    font-weight: bold;
+}
+
+.advancedrequestscontainer {
+    margin: 0px 0px 0px 10px; 
+}
+
+
+
+#sectionrequetesavancees .container {
+    display: block;
+}
+
+#column-checkbox-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.requestselcontainer {
+    display: flex;
+    gap:10px;
+    align-items: center;
+}
+
+#column-checkbox-container {
+    border: solid 1px yellow;
+    padding: 10px 10px 0px 10px;
+    border-radius: 5px;
+    box-shadow: 6px 6px 0px rgba(51, 49, 49, 0.58);
+}
+
+#value-container {
+    display: flex;
+    flex-direction: column;
+}
