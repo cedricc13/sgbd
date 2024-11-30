@@ -61,17 +61,40 @@ async function getValidAttributes(table) {
 }
 
 async function SelectSQL(res, table, filteredAttributes) {
-  const attr = filteredAttributes.join(', ');
-  const query = `SELECT ${attr} FROM ${table}`;
-  console.log("Requête SQL générée :", query);  // Vérifier la requête
-
-  try {
+  // Si des jointures sont nécessaires pour récupérer des noms et immatriculations
+  if (table === 'livraison') {
+    const query = `
+      SELECT 
+        c.nom_chauffeur AS nom_chauffeur, 
+        cam.immatriculation AS immatriculation 
+      FROM 
+        livraison l
+      JOIN 
+        chauffeur c ON l.chauffeur_id = c.chauffeur_id
+      JOIN 
+        camion cam ON l.camion_id = cam.camion_id;
+    `;
+    console.log("Requête SQL avec jointures :", query); // Vérifiez la requête générée
+    try {
       const result = await pool.query(query);
-      console.log(`-SERVER: ${table} affichés avec attributs sélectionnés ${attr}`); 
+      console.log("Données récupérées :", result.rows);
       return res.json(result.rows);
-  } catch (err) {
-      console.error('Erreur lors de la récupération des chauffeurs :', err);
-      return res.status(500).json({ error: 'Erreur lors de la récupération des chauffeurs' });
+    } catch (err) {
+      console.error("Erreur lors de la récupération des livraisons avec jointures :", err);
+      return res.status(500).json({ error: "Erreur lors de la récupération des données." });
+    }
+  } else {
+    // Ancienne logique pour les autres tables
+    const attr = filteredAttributes.join(", ");
+    const query = `SELECT ${attr} FROM ${table}`;
+    console.log("Requête SQL générée :", query);
+    try {
+      const result = await pool.query(query);
+      return res.json(result.rows);
+    } catch (err) {
+      console.error(`Erreur lors de la récupération de ${table} :`, err);
+      return res.status(500).json({ error: `Erreur lors de la récupération de ${table}` });
+    }
   }
 }
 
@@ -199,88 +222,11 @@ app.get('/api/camion/ids', async (req, res) => {
   }
 });
 
-// Middleware to replace chauffeur_id with nom_chauffeur and camion_id with immatriculation_camion in the response
-app.use((req, res, next) => {
-  const originalJson = res.json;
-  res.json = function (data) {
-    if (Array.isArray(data)) {
-      data = data.map(row => {
-        if (row.chauffeur_id) {
-          row.nom_chauffeur = `Nom du chauffeur ${row.chauffeur_id}`; // Replace with actual logic to get nom_chauffeur
-          delete row.chauffeur_id;
-        }
-        if (row.camion_id) {
-          row.immatriculation_camion = `Immatriculation ${row.camion_id}`; // Replace with actual logic to get immatriculation_camion
-          delete row.camion_id;
-        }
-        return row;
-      });
-    }
-    originalJson.call(this, data);
-  };
-  next();
-});
-
-// Function to get nom_chauffeur by chauffeur_id
-async function getNomChauffeur(chauffeur_id) {
-  const query = 'SELECT nom_chauffeur FROM chauffeur WHERE chauffeur_id = $1';
-  const result = await pool.query(query, [chauffeur_id]);
-  return result.rows[0]?.nom_chauffeur;
-}
-
-// Function to get immatriculation_camion by camion_id
-async function getImmatriculationCamion(camion_id) {
-  const query = 'SELECT immatriculation_camion FROM camion WHERE camion_id = $1';
-  const result = await pool.query(query, [camion_id]);
-  return result.rows[0]?.immatriculation_camion;
-}
-
-// Modify AddSQL function to handle nom_chauffeur and immatriculation_camion
-async function AddSQL(req, res, tableName) {
-  try {
-    const validAttributes = await getValidAttributes(tableName);
-    const attributes = Object.keys(req.body);
-    const filteredAttributes = attributes.filter(attr => validAttributes.includes(attr));
-    const filteredValues = filteredAttributes.map(attr => req.body[attr]);
-
-    if (filteredAttributes.length !== filteredValues.length) {
-      return res.status(400).json({ error: 'Le nombre d\'attributs et de valeurs ne correspond pas.' });
-    }
-
-    const attributesString = filteredAttributes.join(', ');
-    const placeholders = filteredAttributes.map((_, index) => `$${index + 1}`).join(', ');
-
-    if (tableName === 'appartenir' || tableName === 'conduire' || tableName === 'distance' || tableName === 'contenir') {
-      const query = `INSERT INTO ${tableName} (${attributesString}) VALUES (${placeholders})`;
-      await pool.query(query, filteredValues);
-      return res.json({ message: `${tableName.charAt(0).toUpperCase() + tableName.slice(1)} ajouté avec succès` });
-    }
-
-    const query = `INSERT INTO ${tableName} (${attributesString}) VALUES (${placeholders}) RETURNING ${tableName}_id`;
-    const result = await pool.query(query, filteredValues);
-    const id = result.rows[0][`${tableName}_id`];
-
-    if (tableName === 'chauffeur') {
-      const nom_chauffeur = await getNomChauffeur(id);
-      return res.json({ message: `${tableName.charAt(0).toUpperCase() + tableName.slice(1)} ajouté avec succès`, nom_chauffeur });
-    }
-
-    if (tableName === 'camion') {
-      const immatriculation_camion = await getImmatriculationCamion(id);
-      return res.json({ message: `${tableName.charAt(0).toUpperCase() + tableName.slice(1)} ajouté avec succès`, immatriculation_camion });
-    }
-
-    return res.json({ message: `${tableName.charAt(0).toUpperCase() + tableName.slice(1)} ajouté avec succès`, id });
-  } catch (err) {
-    return res.status(500).json({ error: `Erreur lors de l'ajout de ${tableName}` });
-  }
-}
 
 // LIVRAISONS
 app.post('/api/livraisonGet', async (req, res) => {
   const { attributes } = req.body;  // recup les attributs envoyés par client
-  const table = 'livraison';
-  console.log(attributes);
+  const table = 'livraison'; 
 
   try {
     const validAttributes = await getValidAttributes(table);
