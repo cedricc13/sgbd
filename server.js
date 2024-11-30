@@ -87,6 +87,7 @@ async function SelectSQL(res, table, filteredAttributes) {
   try {
     const result = await pool.query(query); // Exécution de la requête
     console.log(`-SERVER: ${table} affichés avec attributs sélectionnés ${attr}`);
+    console.log(result.rows);
     return res.json(result.rows); // Retourne les résultats
   } catch (err) {
     console.error('Erreur lors de la récupération des données :', err);
