@@ -59,6 +59,12 @@ function generateTableHTML(attributes, entreeList) {
         if (attribute === 'chauffeur_id') {
             attribute = 'nom_chauffeur';
         }
+        if (attribute === 'depot_depart_id') {
+            attribute = 'intitule_depot_depart';
+        }
+        if (attribute === 'depot_arrivee_id') {
+            attribute = 'intitule_depot_arrivee';
+        }
         contentHTML += `<p class='ligne entete'>${attribute}</p>`;  // Titre à chaque colonne
     });
     contentHTML += `</div>`; 
@@ -72,6 +78,12 @@ function generateTableHTML(attributes, entreeList) {
             }
             if (attribute === 'chauffeur_id') {
                 attribute = 'nom_chauffeur';
+            }
+            if (attribute === 'depot_depart_id') {
+                attribute = 'intitule_depot_depart';
+            }
+            if (attribute === 'depot_arrivee_id') {
+                attribute = 'intitule_depot_arrivee';
             }
             const value = entree[attribute] || ''; // Si la donnée est undefined ou null, affiche une chaîne vide
             contentHTML += `<p class='attribut'>${value}</p>`;  
