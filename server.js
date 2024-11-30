@@ -61,40 +61,17 @@ async function getValidAttributes(table) {
 }
 
 async function SelectSQL(res, table, filteredAttributes) {
-  // Si des jointures sont nécessaires pour récupérer des noms et immatriculations
-  if (table === 'livraison') {
-    const query = `
-      SELECT 
-        c.nom_chauffeur AS nom_chauffeur, 
-        cam.immatriculation AS immatriculation 
-      FROM 
-        livraison l
-      JOIN 
-        chauffeur c ON l.chauffeur_id = c.chauffeur_id
-      JOIN 
-        camion cam ON l.camion_id = cam.camion_id;
-    `;
-    console.log("Requête SQL avec jointures :", query); // Vérifiez la requête générée
-    try {
+  const attr = filteredAttributes.join(', ');
+  const query = `SELECT ${attr} FROM ${table}`;
+  console.log("Requête SQL générée :", query);  // Vérifier la requête
+
+  try {
       const result = await pool.query(query);
-      console.log("Données récupérées :", result.rows);
+      console.log(`-SERVER: ${table} affichés avec attributs sélectionnés ${attr}`); 
       return res.json(result.rows);
-    } catch (err) {
-      console.error("Erreur lors de la récupération des livraisons avec jointures :", err);
-      return res.status(500).json({ error: "Erreur lors de la récupération des données." });
-    }
-  } else {
-    // Ancienne logique pour les autres tables
-    const attr = filteredAttributes.join(", ");
-    const query = `SELECT ${attr} FROM ${table}`;
-    console.log("Requête SQL générée :", query);
-    try {
-      const result = await pool.query(query);
-      return res.json(result.rows);
-    } catch (err) {
-      console.error(`Erreur lors de la récupération de ${table} :`, err);
-      return res.status(500).json({ error: `Erreur lors de la récupération de ${table}` });
-    }
+  } catch (err) {
+      console.error('Erreur lors de la récupération des chauffeurs :', err);
+      return res.status(500).json({ error: 'Erreur lors de la récupération des chauffeurs' });
   }
 }
 
@@ -156,7 +133,6 @@ app.post('/api/chauffeurGet', async (req, res) => {
   try {
     const validAttributes = await getValidAttributes(table);
     const filteredAttributes = attributes.filter(attribute => validAttributes.includes(attribute));
-    
     if (filteredAttributes.length === 0) {
       return res.status(400).json({ error: 'Aucun attribut valide sélectionné' });
     }
@@ -231,7 +207,8 @@ app.post('/api/livraisonGet', async (req, res) => {
   try {
     const validAttributes = await getValidAttributes(table);
     const filteredAttributes = attributes.filter(attribute => validAttributes.includes(attribute));
-    
+    console.log('validAttributes:' + validAttributes);
+    console.log('filteredAttributes:' + filteredAttributes);
     if (filteredAttributes.length === 0) {
       return res.status(400).json({ error: 'Aucun attribut valide sélectionné' });
     }
