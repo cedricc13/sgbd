@@ -53,6 +53,12 @@ function generateTableHTML(attributes, entreeList) {
     attributes = attributes.filter(attribute => attribute && attribute.trim() !== '');
     let contentHTML = `<div class='ligne nomsattributs'>`;  
     attributes.forEach(attribute => {
+        if (attribute === 'camion_id') {
+            attribute = 'immatriculation';
+        }
+        if (attribute === 'chauffeur_id') {
+            attribute = 'nom_chauffeur';
+        }
         contentHTML += `<p class='ligne entete'>${attribute}</p>`;  // Titre à chaque colonne
     });
     contentHTML += `</div>`; 
@@ -156,7 +162,7 @@ function loadDropdowns(table, elementId) {
             data.forEach(elt => {
                 const option = document.createElement('option');
                 option.value = elt.id;
-                option.textContent = `#${elt.id}`;
+                option.textContent = `#${elt.nom}`;
                 eltSelect.appendChild(option);
             });
         })

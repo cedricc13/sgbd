@@ -174,7 +174,7 @@ app.post('/api/chauffeurAdd', async (req, res) => {
 // Exemple de log plus détaillé dans l'API chauffeurs
 app.get('/api/chauffeur/ids', async (req, res) => {
   try {
-      const result = await pool.query('SELECT chauffeur_id AS id FROM CHAUFFEUR');
+      const result = await pool.query('SELECT chauffeur_id AS id, nom_chauffeur AS nom FROM CHAUFFEUR');
       res.json(result.rows);
   } catch (error) {
       console.error('Erreur dans /api/chauffeur/ids:', error.message);
@@ -210,7 +210,7 @@ app.post('/api/camionAdd', async (req, res) => {
 // Route pour récupérer les IDs des camions
 app.get('/api/camion/ids', async (req, res) => {
   try {
-      const result = await pool.query('SELECT camion_id AS id FROM CAMION');
+      const result = await pool.query('SELECT camion_id AS id, immatriculation AS nom FROM CAMION');
       res.json(result.rows);
   } catch (error) {
       console.error('Erreur dans /api/camion/ids:', error.message);
@@ -227,8 +227,6 @@ app.post('/api/livraisonGet', async (req, res) => {
   try {
     const validAttributes = await getValidAttributes(table);
     const filteredAttributes = attributes.filter(attribute => validAttributes.includes(attribute));
-    console.log('validAttributes:' + validAttributes);
-    console.log('filteredAttributes:' + filteredAttributes);
     if (filteredAttributes.length === 0) {
       return res.status(400).json({ error: 'Aucun attribut valide sélectionné' });
     }
@@ -283,7 +281,7 @@ app.post('/api/depotAdd', async (req, res) => {
 
 app.get('/api/depot/ids', async (req, res) => {
   try {
-      const result = await pool.query('SELECT depot_id AS id FROM DEPOT');
+      const result = await pool.query('SELECT depot_id AS id, intitule_depot AS nom FROM DEPOT');
       return res.json(result.rows);
   } catch (error) {
       console.error('Erreur dans /api/depot_arrivee/ids:', error.message);
