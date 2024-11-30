@@ -64,31 +64,32 @@ async function SelectSQL(res, table, filteredAttributes) {
   let attr = filteredAttributes.join(', '); // Jointure des attributs
   let query = `SELECT ${attr} FROM ${table}`;
 
-  if (table === "livraison") {
-    // Remplacement des colonnes spécifiques à livraison
-    if (filteredAttributes.includes("camion_id")) {
-      attr = attr.replace("camion_id", "immatriculation");
-    }
-    if (filteredAttributes.includes("chauffeur_id")) {
-      attr = attr.replace("chauffeur_id", "nom_chauffeur");
-    }
-    if (filteredAttributes.includes("depot_arrivee_id")) {
-      attr = attr.replace("depot_arrivee_id", "intitule_depot");
-    }
-    if (filteredAttributes.includes("depot_depart_id")) {
-      attr = attr.replace("depot_depart_id", "intitule_depot");
-    }
-  
-    // Construction de la requête avec jointures et alias pour les tables depot
-    query = `
-      SELECT ${attr} 
-      FROM livraison 
-      JOIN camion ON livraison.camion_id = camion.camion_id
-      JOIN chauffeur ON livraison.chauffeur_id = chauffeur.chauffeur_id
-      JOIN depot AS depot_arrivee ON livraison.depot_arrivee_id = depot_arrivee.depot_id
-      JOIN depot AS depot_depart ON livraison.depot_depart_id = depot_depart.depot_id
-    `;
+    if (table === "livraison") {
+      // Remplacement des colonnes spécifiques à livraison
+      if (filteredAttributes.includes("camion_id")) {
+        attr = attr.replace("camion_id", "immatriculation");
+      }
+      if (filteredAttributes.includes("chauffeur_id")) {
+        attr = attr.replace("chauffeur_id", "nom_chauffeur");
+      }
+      if (filteredAttributes.includes("depot_arrivee_id")) {
+        attr = attr.replace("depot_arrivee_id", "intitule_depot_arrivee");
+      }
+      if (filteredAttributes.includes("depot_depart_id")) {
+        attr = attr.replace("depot_depart_id", "intitule_depot_depart");
+      }
+    
+      // Construction de la requête avec jointures et alias pour les tables depot
+      query = `
+        SELECT ${attr} 
+        FROM livraison 
+        JOIN camion ON livraison.camion_id = camion.camion_id
+        JOIN chauffeur ON livraison.chauffeur_id = chauffeur.chauffeur_id
+        JOIN depot AS depot_arrivee ON livraison.depot_arrivee_id = depot_arrivee.depot_id
+        JOIN depot AS depot_depart ON livraison.depot_depart_id = depot_depart.depot_id
+      `;
   }
+
 
   if (table === "infraction") {
     // Remplacement des colonnes spécifiques à infraction
