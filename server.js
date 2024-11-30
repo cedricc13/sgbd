@@ -58,11 +58,16 @@ async function getValidAttributes(table) {
     console.error('Erreur lors de la récupération des colonnes de la table', err);
     throw err;
   }
-}
+} 
 
 async function SelectSQL(res, table, filteredAttributes) {
   const attr = filteredAttributes.join(', ');
   const query = `SELECT ${attr} FROM ${table}`;
+  if (table == "livraison") {
+    attr.replace("camion_id","immatriculation");
+    attr.replace("chauffeur_id","nom_chauffeur");
+    query = `SELECT ${attr} FROM ${table} NATURAL JOIN camion NATURAL JOIN chauffeur`;
+  }
   console.log("Requête SQL générée :", query);  // Vérifier la requête
 
   try {
