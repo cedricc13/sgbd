@@ -147,7 +147,7 @@ async function displayTable(table) {
 
 function updateLivraison(livraisonId) {
     const statut = document.getElementById(`statut_livraison_${livraisonId}`).value;
-
+    console.log("<<<<<<ccacacacacacacacaac");
     fetch(`/api/livraisonUpdate`, {
         method: 'PUT',  
         headers: {
