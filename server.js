@@ -89,7 +89,6 @@ async function SelectSQL(res, table, filteredAttributes) {
       JOIN depot AS depot_depart ON livraison.depot_depart_id = depot_depart.depot_id
     `;
   }
-  }
 
   if (table === "infraction") {
     // Remplacement des colonnes spécifiques à infraction
