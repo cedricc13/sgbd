@@ -51,7 +51,6 @@ function getAttributesTicked(table) {
 function generateTableHTML(attributes, entreeList) {
     // Filtrage des attributs pour éviter les vides
     attributes = attributes.filter(attribute => attribute && attribute.trim() !== '');
-    
     let contentHTML = `<div class='ligne nomsattributs'>`;  
     attributes.forEach(attribute => {
         contentHTML += `<p class='ligne entete'>${attribute}</p>`;  // Titre à chaque colonne
@@ -62,6 +61,12 @@ function generateTableHTML(attributes, entreeList) {
     entreeList.forEach(entree => {
         contentHTML += `<div class='ligne entree'>`;  
         attributes.forEach(attribute => {
+            if (attribute === 'camion_id') {
+                attribute = 'immatriculation';
+            }
+            if (attribute === 'chauffeur_id') {
+                attribute = 'nom_chauffeur';
+            }
             const value = entree[attribute] || ''; // Si la donnée est undefined ou null, affiche une chaîne vide
             contentHTML += `<p class='attribut'>${value}</p>`;  
         });
