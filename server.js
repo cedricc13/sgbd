@@ -61,24 +61,36 @@ async function getValidAttributes(table) {
 } 
 
 async function SelectSQL(res, table, filteredAttributes) {
-  const attr = filteredAttributes.join(', ');
+  let attr = filteredAttributes.join(', '); // Jointure des attributs
   let query = `SELECT ${attr} FROM ${table}`;
+
   if (table === "livraison") {
-    console.log("cacacacacaca");
-    attr.replace("camion_id","immatriculation");
-    attr.replace("chauffeur_id","nom_chauffeur");
-    query = `SELECT ${attr} FROM ${table} NATURAL JOIN camion NATURAL JOIN chauffeur`;
-    console.log(query);
+    // Remplacement des colonnes spécifiques à livraison
+    if (filteredAttributes.includes("camion_id")) {
+      attr = attr.replace("camion_id", "immatriculation");
+    }
+    if (filteredAttributes.includes("chauffeur_id")) {
+      attr = attr.replace("chauffeur_id", "nom_chauffeur");
+    }
+
+    // Construction de la requête avec jointures
+    query = `
+      SELECT ${attr} 
+      FROM livraison 
+      JOIN camion ON livraison.camion_id = camion.camion_id
+      JOIN chauffeur ON livraison.chauffeur_id = chauffeur.chauffeur_id
+    `;
   }
-  console.log("Requête SQL générée :", query);  // Vérifier la requête
+
+  console.log("Requête SQL générée :", query); // Vérifier la requête générée
 
   try {
-      const result = await pool.query(query);
-      console.log(`-SERVER: ${table} affichés avec attributs sélectionnés ${attr}`); 
-      return res.json(result.rows);
+    const result = await pool.query(query); // Exécution de la requête
+    console.log(`-SERVER: ${table} affichés avec attributs sélectionnés ${attr}`);
+    return res.json(result.rows); // Retourne les résultats
   } catch (err) {
-      console.error('Erreur lors de la récupération des chauffeurs :', err);
-      return res.status(500).json({ error: 'Erreur lors de la récupération des chauffeurs' });
+    console.error('Erreur lors de la récupération des données :', err);
+    return res.status(500).json({ error: 'Erreur lors de la récupération des données.' });
   }
 }
 
