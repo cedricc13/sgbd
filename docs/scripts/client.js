@@ -103,8 +103,6 @@ function generateTableHTML(attributes, entreeList) {
     return contentHTML;
 }
 
- 
-
 //affiche la table table, sur les attrinbuts selectionnées dans le form html
 async function displayTable(table) {
     console.log(`displayTable appelée sur ${table}`); 
