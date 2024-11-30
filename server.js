@@ -62,7 +62,7 @@ async function getValidAttributes(table) {
 
 async function SelectSQL(res, table, filteredAttributes) {
   const attr = filteredAttributes.join(', ');
-  const query = `SELECT ${attr} FROM ${table}`;
+  let query = `SELECT ${attr} FROM ${table}`;
   if (table == "livraison") {
     attr.replace("camion_id","immatriculation");
     attr.replace("chauffeur_id","nom_chauffeur");
