@@ -288,6 +288,7 @@ app.put('/api/livraisonUpdate', async (req, res) => {
       WHERE livraison_id = $2
       RETURNING *;
   `;
+  console.log('Requête SQL générée update livraison:', query);
 
   try {
       const result = await pool.query(query, [statut_livraison, livraison_id]);
