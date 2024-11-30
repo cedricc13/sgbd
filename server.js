@@ -63,10 +63,12 @@ async function getValidAttributes(table) {
 async function SelectSQL(res, table, filteredAttributes) {
   const attr = filteredAttributes.join(', ');
   let query = `SELECT ${attr} FROM ${table}`;
-  if (table == "livraison") {
+  if (table === "livraison") {
+    console.log("cacacacacaca");
     attr.replace("camion_id","immatriculation");
     attr.replace("chauffeur_id","nom_chauffeur");
     query = `SELECT ${attr} FROM ${table} NATURAL JOIN camion NATURAL JOIN chauffeur`;
+    console.log(query);
   }
   console.log("Requête SQL générée :", query);  // Vérifier la requête
 
