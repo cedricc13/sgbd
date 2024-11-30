@@ -86,7 +86,15 @@ function generateTableHTML(attributes, entreeList) {
                 attribute = 'intitule_depot_arrivee';
             }
             const value = entree[attribute] || ''; // Si la donnée est undefined ou null, affiche une chaîne vide
+            if (attribute === "statut_livraison") {
+                contentHTML += `<select class='attribut' name='statut_livraison' id='statut_livraison_${entree.livraison_id}' onchange='updateLivraison(${entree.livraison_id})'>`;
+                contentHTML += `<option value='En attente' ${entree.statut_livraison === 'En attente' ? 'selected' : ''}>En attente</option>`;
+                contentHTML += `<option value='En cours' ${entree.statut_livraison === 'En cours' ? 'selected' : ''}>En cours</option>`;
+                contentHTML += `<option value='Terminée' ${entree.statut_livraison === 'Terminée' ? 'selected' : ''}>Terminée</option>`;
+                contentHTML += `</select>`;
+            }
             contentHTML += `<p class='attribut'>${value}</p>`;  
+
         });
         contentHTML += `</div>`;  
     });
@@ -135,6 +143,26 @@ async function displayTable(table) {
         const tableList = document.getElementById(`${table}-list`);
         tableList.innerHTML = '<p>Une erreur est survenue lors du chargement des données.</p>';
     }
+}
+
+function updateLivraison(livraisonId) {
+    const statut = document.getElementById(`statut_livraison_${livraisonId}`).value;
+
+    fetch(`/api/livraisonUpdate`, {
+        method: 'PUT',  
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            livraison_id: livraisonId,
+            statut_livraison: statut
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Statut mis à jour:', data);
+    })
+    .catch(error => console.error('Erreur lors de la mise à jour:', error));
 }
 
 // Ajoute un nouveau chauffeur

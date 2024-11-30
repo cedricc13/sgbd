@@ -81,7 +81,7 @@ async function SelectSQL(res, table, filteredAttributes) {
   
     // Construction de la requête avec jointures et alias pour les tables depot
     query = `
-      SELECT ${attr} 
+      SELECT ${attr}, livraison_id
       FROM livraison 
       JOIN camion ON livraison.camion_id = camion.camion_id
       JOIN chauffeur ON livraison.chauffeur_id = chauffeur.chauffeur_id
@@ -278,6 +278,27 @@ app.post('/api/livraisonAdd', async (req, res) => {
   console.log('-  SERVER: Données reçues pour la livraison:', req.body);
   //on fait un ajout sql sur la bonne table avec les bonnes données
   await AddSQL(req, res, 'livraison');
+});
+
+app.put('/api/livraisonUpdate', async (req, res) => {
+  const { livraison_id, statut_livraison } = req.body;
+  const query = `
+      UPDATE livraison
+      SET statut_livraison = $1
+      WHERE livraison_id = $2
+      RETURNING *;
+  `;
+
+  try {
+      const result = await pool.query(query, [statut_livraison, livraison_id]);
+      if (result.rows.length === 0) {
+          return res.status(404).json({ error: 'Livraison non trouvée' });
+      }
+      res.json({ message: 'Statut mis à jour avec succès', data: result.rows[0] });
+  } catch (error) {
+      console.error('Erreur lors de la mise à jour du statut:', error);
+      res.status(500).json({ error: 'Erreur lors de la mise à jour' });
+  }
 });
 
 app.get('/api/livraison/ids', async (req, res) => {
