@@ -286,8 +286,6 @@
                 <h4>Sélectionner les attributs à afficher</h4>
                 <form id="produit-attributs-form">
                     <label><input type="checkbox" id="selectAllproduit" /> Tout sélectionner</label><br>
-
-                    <label><input type="checkbox" name="produit_id" /> Id du Produit</label><br>
                     <label><input type="checkbox" name="nom_produit" /> Nom du Produit</label><br>
                     <label><input type="checkbox" name="poids" /> Poids (kg)</label><br>
                 </form>
@@ -320,7 +318,7 @@
     
     <!-- Section Infractions -->
     <div id="sectioninfraction" class="section hidden">
-        <h3>INFRACTIONS</h3>
+        <h3>INFRACTION</h3>
         <h2>Affichage</h2>
 
         <div class="container">
@@ -330,7 +328,7 @@
                     <label><input type="checkbox" id="selectAllinfraction" /> Tout sélectionner</label><br>
                     <label><input type="checkbox" name="date_infraction" /> Date d'Infraction</label><br>
                     <label><input type="checkbox" name="type_infraction" /> Type d'Infraction</label><br>
-                    <label><input type="checkbox" name="chauffeur_id" /> Id du chauffeur</label><br> 
+                    <label><input type="checkbox" name="chauffeur_id" /> Nom du chauffeur</label><br> 
                 </form>
                 <button type="button" onclick="displayTable('infraction')">Afficher</button>
             </div>
@@ -353,7 +351,7 @@
                         <input type="text" id="type_infraction" placeholder="Type d'Infraction">
                     
 
-                    <label for="chauffeur_id_sel_2">Id du Chauffeur</label>
+                    <label for="chauffeur_id_sel_2">Nom du chauffeur</label>
                         <select id="chauffeur_id_sel_2">
                             <option value="">Sélectionnez un chauffeur</option>
                         </select>
@@ -368,7 +366,7 @@
     
    <!-- Section Absences -->
     <div id="sectionabsence" class="section hidden">
-        <h3>ABSENCES</h3>
+        <h3>ABSENCE</h3>
         <h2>Affichage</h2>
 
         <div class="container">
@@ -376,7 +374,7 @@
                 <h4>Sélectionner les attributs à afficher</h4>
                 <form id="absence-attributs-form">
                     <label><input type="checkbox" id="selectAllabsence" /> Tout sélectionner</label><br>
-                    <label><input type="checkbox" name="chauffeur_id" /> Id du chauffeur</label><br>
+                    <label><input type="checkbox" name="chauffeur_id" /> Nom chauffeur</label><br>
                     <label><input type="checkbox" name="date_debut" /> Date de Début</label><br>
                     <label><input type="checkbox" name="date_fin" /> Date de Fin</label><br>
                 </form>
@@ -401,7 +399,7 @@
                             <input type="date" id="date_fin" placeholder="Date de Fin">
                         
                     
-                        <label for="chauffeur_id_sel_3">Id du Chauffeur</label>
+                        <label for="chauffeur_id_sel_3">Nom chauffeur</label>
                             <select id="chauffeur_id_sel_3">
                                 <option value="">Sélectionnez un chauffeur</option>
                             </select>

@@ -82,6 +82,34 @@ async function SelectSQL(res, table, filteredAttributes) {
     `;
   }
 
+  if (table === "infraction") {
+    // Remplacement des colonnes spécifiques à infraction
+    if (filteredAttributes.includes("chauffeur_id")) {
+      attr = attr.replace("chauffeur_id", "nom_chauffeur");
+    }
+
+    // Construction de la requête avec jointures
+    query = `
+      SELECT ${attr} 
+      FROM infraction 
+      JOIN chauffeur ON infraction.chauffeur_id = chauffeur.chauffeur_id
+    `;
+  }
+
+  if (table === "absence") {
+    // Remplacement des colonnes spécifiques à absence
+    if (filteredAttributes.includes("chauffeur_id")) {
+      attr = attr.replace("chauffeur_id", "nom_chauffeur");
+    }
+
+    // Construction de la requête avec jointures
+    query = `
+      SELECT ${attr} 
+      FROM absence 
+      JOIN chauffeur ON absence.chauffeur_id = chauffeur.chauffeur_id
+    `;
+  }
+
   console.log("Requête SQL générée :", query); // Vérifier la requête générée
 
   try {
