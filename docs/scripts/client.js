@@ -8,12 +8,6 @@ function showSection(sectionId) {
     }
 }
 
-document.querySelectorAll('.modifier-btn').forEach(button => {
-    button.addEventListener('click', function() {
-        const livraisonId = this.dataset.livraisonId;
-        updateLivraison(livraisonId);
-    });
-});
 
 // Gestion de la case "Tout sélectionner" pour chaque table
 function manageSelectAll(table) {
@@ -99,6 +93,13 @@ function generateTableHTML(attributes, entreeList) {
 
     return contentHTML;
 }
+
+document.querySelectorAll('.modifier-btn').forEach(button => {
+    button.addEventListener('click', function() {
+        const livraisonId = this.dataset.livraisonId;
+        updateLivraison(livraisonId);
+    });
+});
 
 
 //affiche la table table, sur les attrinbuts selectionnées dans le form html
