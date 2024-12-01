@@ -89,6 +89,14 @@ function generateTableHTML(attributes, entreeList) {
             } else {
                 contentHTML += `<p class='attribut'>${value}</p>`;  
             }
+            // Ajoute le bouton de suppression
+            contentHTML += `
+            <button 
+                class="delete-btn" 
+                data-id="${entree.id}" 
+                data-table="${entree.table}">
+                Supprimer
+            </button>`;
         });
         contentHTML += `</div>`;  
     });
@@ -103,6 +111,32 @@ document.addEventListener('click', function(event) {
         const livraisonId = event.target.getAttribute('data-livraison-id');
         if (livraisonId) {
             updateLivraison(livraisonId);
+        }
+    }
+});
+
+document.addEventListener('click', async function(event) {
+    if (event.target.matches('.delete-btn')) {
+        const id = event.target.getAttribute('data-id');
+        const table = event.target.getAttribute('data-table');
+
+        if (id && table) {
+            if (confirm(`Voulez-vous vraiment supprimer cet élément ?`)) {
+                try {
+                    const response = await fetch(`/api/${table}Delete`, {
+                        method: 'DELETE',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ id })
+                    });
+
+                    if (!response.ok) throw new Error('Erreur lors de la suppression');
+                    alert(`Élément supprimé avec succès`);
+                    displayTable(table); // Recharge la table pour refléter les changements
+                } catch (error) {
+                    console.error('Erreur lors de la suppression:', error);
+                    alert(`Erreur lors de la suppression de l'élément`);
+                }
+            }
         }
     }
 });

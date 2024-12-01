@@ -629,6 +629,24 @@ app.post('/api/contenirAdd', async (req, res) => {
   AddSQL(req, res, 'contenir');
 });
 
+// Suppression générique
+app.delete('/api/:tableDelete', async (req, res) => {
+  const { table } = req.params;
+  const { id } = req.body;
+
+  if (!id) {
+      return res.status(400).json({ error: "ID manquant dans la requête" });
+  }
+
+  try {
+      const query = `DELETE FROM ${table} WHERE id = $1`;
+      await db.query(query, [id]); // Remplace `db.query` par votre méthode d'accès à la base de données
+      return res.status(200).json({ success: true, message: `Élément supprimé de la table ${table}` });
+  } catch (error) {
+      console.error(`Erreur lors de la suppression dans la table ${table}:`, error);
+      return res.status(500).json({ error: "Erreur serveur" });
+  }
+});
 
 
 
