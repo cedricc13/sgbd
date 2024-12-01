@@ -7,13 +7,11 @@ function showSection(sectionId) {
         sectionToShow.classList.remove('hidden');
     }
 }
-document.addEventListener('DOMContentLoaded', function() {
-    document.querySelectorAll('button[onclick^="updateLivraison"]').forEach(button => {
-        button.addEventListener('click', function(event) {
-            event.preventDefault();
-            const livraisonId = this.getAttribute('onclick').match(/\d+/)[0];
-            updateLivraison(livraisonId);
-        });
+
+document.querySelectorAll('.modifier-btn').forEach(button => {
+    button.addEventListener('click', function() {
+        const livraisonId = this.dataset.livraisonId;
+        updateLivraison(livraisonId);
     });
 });
 
@@ -89,7 +87,7 @@ function generateTableHTML(attributes, entreeList) {
                             <option value='En cours' ${entree.statut_livraison === 'En cours' ? 'selected' : ''}>En cours</option>
                             <option value='Terminée' ${entree.statut_livraison === 'Terminée' ? 'selected' : ''}>Terminée</option>
                         </select>
-                        <button onclick='updateLivraison(${entree.livraison_id})'>Modifier</button>
+                        <button class='modifier-btn' data-livraison-id='${entree.livraison_id}'>Modifier</button>                    
                     </div>`;
             } else {
                 contentHTML += `<p class='attribut'>${value}</p>`;  
