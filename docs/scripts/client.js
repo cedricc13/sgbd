@@ -47,7 +47,6 @@ function getAttributesTicked(table) {
         .filter(attribute => attribute.trim() !== '');  
 }
 
-
 function generateTableHTML(attributes, entreeList) {
     attributes = attributes.filter(attribute => attribute && attribute.trim() !== '');
     let contentHTML = `<div class='ligne nomsattributs'>`;  
@@ -81,7 +80,11 @@ function generateTableHTML(attributes, entreeList) {
                             <option value='En cours' ${entree.statut_livraison === 'En cours' ? 'selected' : ''}>En cours</option>
                             <option value='Terminée' ${entree.statut_livraison === 'Terminée' ? 'selected' : ''}>Terminée</option>
                         </select>
-                        <button class='modifier-btn' data-livraison-id='${entree.livraison_id}'>Modifier</button>                    
+                        <button 
+                            class='modifier-btn' 
+                            data-livraison-id='${entree.livraison_id}'>
+                            Modifier
+                        </button>                    
                     </div>`;
             } else {
                 contentHTML += `<p class='attribut'>${value}</p>`;  
@@ -94,12 +97,55 @@ function generateTableHTML(attributes, entreeList) {
     return contentHTML;
 }
 
-document.querySelectorAll('.modifier-btn').forEach(button => {
-    button.addEventListener('click', function() {
-        const livraisonId = this.dataset.livraisonId;
-        updateLivraison(livraisonId);
-    });
+// Gestionnaire d'événements global pour les boutons "Modifier"
+document.addEventListener('click', function(event) {
+    if (event.target.matches('.modifier-btn')) {
+        const livraisonId = event.target.getAttribute('data-livraison-id');
+        if (livraisonId) {
+            updateLivraison(livraisonId);
+        }
+    }
 });
+
+// Fonction updateLivraison modifiée pour une meilleure gestion
+function updateLivraison(livraisonId) {
+    const selectElement = document.getElementById(`statut_livraison_${livraisonId}`);
+    if (!selectElement) {
+        console.error(`Élément select introuvable pour livraison ID ${livraisonId}`);
+        return;
+    }
+
+    const statut = selectElement.value;
+
+    console.log(`Mise à jour du statut pour livraison ID ${livraisonId} avec le statut "${statut}"`);
+
+    fetch(`/api/livraisonUpdate`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            livraison_id: livraisonId,
+            statut_livraison: statut
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`Erreur réseau : ${response.status} ${response.statusText}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Statut mis à jour avec succès:', data);
+        alert(`Livraison #${livraisonId} mise à jour avec succès au statut "${statut}"`);
+    })
+    .catch(error => {
+        console.error('Erreur lors de la mise à jour:', error);
+        alert(`Erreur lors de la mise à jour de la livraison #${livraisonId}.`);
+    });
+}
+
+
 
 
 //affiche la table table, sur les attrinbuts selectionnées dans le form html
@@ -142,34 +188,6 @@ async function displayTable(table) {
     }
 }
 
-function updateLivraison(livraisonId) {
-    const statut = document.getElementById(`statut_livraison_${livraisonId}`).value;
-
-    console.log(`Mise à jour du statut pour livraison ID ${livraisonId} avec le statut "${statut}"`);
-
-    fetch(`/api/livraisonUpdate`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            livraison_id: livraisonId,
-            statut_livraison: statut
-        })
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error(`Erreur réseau : ${response.status} ${response.statusText}`);
-        }
-        return response.json();
-    })
-    .then(data => {
-        console.log('Statut mis à jour avec succès:', data);
-    })
-    .catch(error => {
-        console.error('Erreur lors de la mise à jour:', error);
-    });
-}
 
 // Ajoute un nouveau chauffeur
 async function addToTable(table, attributs) {
