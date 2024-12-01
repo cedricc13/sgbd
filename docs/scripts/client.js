@@ -7,7 +7,16 @@ function showSection(sectionId) {
         sectionToShow.classList.remove('hidden');
     }
 }
-  
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('button[onclick^="updateLivraison"]').forEach(button => {
+        button.addEventListener('click', function(event) {
+            event.preventDefault();
+            const livraisonId = this.getAttribute('onclick').match(/\d+/)[0];
+            updateLivraison(livraisonId);
+        });
+    });
+});
+
 // Gestion de la case "Tout sélectionner" pour chaque table
 function manageSelectAll(table) {
     
