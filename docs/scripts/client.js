@@ -89,18 +89,17 @@ function generateTableHTML(attributes, entreeList) {
             } else {
                 contentHTML += `<p class='attribut'>${value}</p>`;  
             }
-            // Ajoute le bouton de suppression
         });
         contentHTML += `</div>`;  
+        contentHTML += `
+        <button 
+            class="delete-btn" 
+            data-id="${entree.id}" 
+            data-table="${entree.table}">
+            Supprimer
+        </button>`;
+        contentHTML += `</div>`; 
     });
-    contentHTML += `
-            <button 
-                class="delete-btn" 
-                data-id="${entree.id}" 
-                data-table="${entree.table}">
-                Supprimer
-            </button>`;
-    contentHTML += `</div>`; 
 
     return contentHTML;
 }
