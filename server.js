@@ -64,8 +64,8 @@ async function SelectSQL(res, table, filteredAttributes) {
   let attr = filteredAttributes.join(', '); // Jointure des attributs
   let query = `SELECT ${attr} FROM ${table}`;
 
+  // Gérer les cas spécifiques selon la table
   if (table === "livraison") {
-    // Remplacement des colonnes spécifiques à livraison
     if (filteredAttributes.includes("camion_id")) {
       attr = attr.replace("camion_id", "immatriculation");
     }
@@ -78,8 +78,7 @@ async function SelectSQL(res, table, filteredAttributes) {
     if (filteredAttributes.includes("depot_depart_id")) {
       attr = attr.replace("depot_depart_id", "depot_depart.intitule_depot AS intitule_depot_depart");
     }
-  
-    // Construction de la requête avec jointures et alias pour les tables depot
+
     query = `
       SELECT ${attr}, livraison_id
       FROM livraison 
@@ -91,40 +90,43 @@ async function SelectSQL(res, table, filteredAttributes) {
   }
 
   if (table === "infraction") {
-    // Remplacement des colonnes spécifiques à infraction
     if (filteredAttributes.includes("chauffeur_id")) {
       attr = attr.replace("chauffeur_id", "nom_chauffeur");
     }
 
-    // Construction de la requête avec jointures
     query = `
-      SELECT ${attr} 
+      SELECT ${attr}, infraction_id
       FROM infraction 
       JOIN chauffeur ON infraction.chauffeur_id = chauffeur.chauffeur_id
     `;
   }
 
   if (table === "absence") {
-    // Remplacement des colonnes spécifiques à absence
     if (filteredAttributes.includes("chauffeur_id")) {
       attr = attr.replace("chauffeur_id", "nom_chauffeur");
     }
 
-    // Construction de la requête avec jointures
     query = `
-      SELECT ${attr} 
+      SELECT ${attr}, absence_id
       FROM absence 
       JOIN chauffeur ON absence.chauffeur_id = chauffeur.chauffeur_id
     `;
   }
 
-  console.log("Requête SQL générée :", query); // Vérifier la requête générée
+  console.log("Requête SQL générée :", query);
 
   try {
     const result = await pool.query(query); // Exécution de la requête
     console.log(`-SERVER: ${table} affichés avec attributs sélectionnés ${attr}`);
-    console.log(result.rows);
-    return res.json(result.rows); // Retourne les résultats
+
+    // Ajout de la table et de l'ID dans chaque ligne de la réponse
+    const responseData = result.rows.map(row => ({
+      table: table, // Ajoute le nom de la table
+      id: row[`${table}_id`], // Extrait l'ID spécifique de chaque ligne
+      data: row // Inclut les autres données
+    }));
+
+    return res.json(responseData); // Retourne les résultats enrichis
   } catch (err) {
     console.error('Erreur lors de la récupération des données :', err);
     return res.status(500).json({ error: 'Erreur lors de la récupération des données.' });
