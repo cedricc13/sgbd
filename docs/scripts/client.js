@@ -47,25 +47,15 @@ function getAttributesTicked(table) {
 }
 
 
-// Génère le HTML pour afficher la liste des chauffeurs
 function generateTableHTML(attributes, entreeList) {
-    // Filtrage des attributs pour éviter les vides
     attributes = attributes.filter(attribute => attribute && attribute.trim() !== '');
     let contentHTML = `<div class='ligne nomsattributs'>`;  
     attributes.forEach(attribute => {
-        if (attribute === 'camion_id') {
-            attribute = 'immatriculation';
-        }
-        if (attribute === 'chauffeur_id') {
-            attribute = 'nom_chauffeur';
-        }
-        if (attribute === 'depot_depart_id') {
-            attribute = 'intitule_depot_depart';
-        }
-        if (attribute === 'depot_arrivee_id') {
-            attribute = 'intitule_depot_arrivee';
-        }
-        contentHTML += `<p class='ligne entete'>${attribute}</p>`;  // Titre à chaque colonne
+        if (attribute === 'camion_id') attribute = 'immatriculation';
+        if (attribute === 'chauffeur_id') attribute = 'nom_chauffeur';
+        if (attribute === 'depot_depart_id') attribute = 'intitule_depot_depart';
+        if (attribute === 'depot_arrivee_id') attribute = 'intitule_depot_arrivee';
+        contentHTML += `<p class='ligne entete'>${attribute}</p>`;
     });
     contentHTML += `</div>`; 
 
@@ -73,28 +63,28 @@ function generateTableHTML(attributes, entreeList) {
     entreeList.forEach(entree => {
         contentHTML += `<div class='ligne entree'>`;  
         attributes.forEach(attribute => {
-            if (attribute === 'camion_id') {
-                attribute = 'immatriculation';
-            }
-            if (attribute === 'chauffeur_id') {
-                attribute = 'nom_chauffeur';
-            }
-            if (attribute === 'depot_depart_id') {
-                attribute = 'intitule_depot_depart';
-            }
-            if (attribute === 'depot_arrivee_id') {
-                attribute = 'intitule_depot_arrivee';
-            }
-            const value = entree[attribute] || ''; // Si la donnée est undefined ou null, affiche une chaîne vide
-            if (attribute === "statut_livraison") {
-                contentHTML += `<select class='attribut' name='statut_livraison' id='statut_livraison_${entree.livraison_id}' onchange='updateLivraison(${entree.livraison_id})'>`;
-                contentHTML += `<option value='En attente' ${entree.statut_livraison === 'En attente' ? 'selected' : ''}>En attente</option>`;
-                contentHTML += `<option value='En cours' ${entree.statut_livraison === 'En cours' ? 'selected' : ''}>En cours</option>`;
-                contentHTML += `<option value='Terminée' ${entree.statut_livraison === 'Terminée' ? 'selected' : ''}>Terminée</option>`;
-                contentHTML += `</select>`;
-            }
-            contentHTML += `<p class='attribut'>${value}</p>`;  
+            if (attribute === 'camion_id') attribute = 'immatriculation';
+            if (attribute === 'chauffeur_id') attribute = 'nom_chauffeur';
+            if (attribute === 'depot_depart_id') attribute = 'intitule_depot_depart';
+            if (attribute === 'depot_arrivee_id') attribute = 'intitule_depot_arrivee';
+            
+            const value = entree[attribute] || '';
 
+            // Si c'est le statut de livraison, ajoute le select et le bouton
+            if (attribute === "statut_livraison") {
+                const selectId = `statut_livraison_${entree.livraison_id}`;
+                contentHTML += `
+                    <div class="statut-container">
+                        <select class='attribut' name='statut_livraison' id='${selectId}'>
+                            <option value='En attente' ${entree.statut_livraison === 'En attente' ? 'selected' : ''}>En attente</option>
+                            <option value='En cours' ${entree.statut_livraison === 'En cours' ? 'selected' : ''}>En cours</option>
+                            <option value='Terminée' ${entree.statut_livraison === 'Terminée' ? 'selected' : ''}>Terminée</option>
+                        </select>
+                        <button onclick='updateLivraison(${entree.livraison_id})'>Modifier</button>
+                    </div>`;
+            } else {
+                contentHTML += `<p class='attribut'>${value}</p>`;  
+            }
         });
         contentHTML += `</div>`;  
     });
@@ -102,6 +92,7 @@ function generateTableHTML(attributes, entreeList) {
 
     return contentHTML;
 }
+
 
 //affiche la table table, sur les attrinbuts selectionnées dans le form html
 async function displayTable(table) {
@@ -143,29 +134,6 @@ async function displayTable(table) {
     }
 }
 
-// Fonction pour ajouter dynamiquement un gestionnaire onchange à chaque <select>
-function attachEventHandlersToSelects() {
-    // Sélectionne tous les éléments <select> liés au statut de livraison
-    const selects = document.querySelectorAll("select[name='statut_livraison']");
-    
-    // Parcours chaque <select> pour y ajouter un gestionnaire d'événement
-    selects.forEach(select => {
-        select.addEventListener("change", (event) => {
-            // Récupère l'ID de livraison à partir de l'ID de l'élément <select>
-            const livraisonId = select.id.split("_")[2]; // Ex: statut_livraison_1 -> 1
-            
-            // Appelle la fonction pour mettre à jour le statut
-            updateLivraison(livraisonId);
-        });
-    });
-}
-
-// Appelle la fonction après le rendu initial de la page
-document.addEventListener("DOMContentLoaded", () => {
-    attachEventHandlersToSelects();
-});
-
-// Fonction pour mettre à jour le statut
 function updateLivraison(livraisonId) {
     const statut = document.getElementById(`statut_livraison_${livraisonId}`).value;
 
