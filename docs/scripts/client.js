@@ -143,11 +143,36 @@ async function displayTable(table) {
     }
 }
 
+// Fonction pour ajouter dynamiquement un gestionnaire onchange à chaque <select>
+function attachEventHandlersToSelects() {
+    // Sélectionne tous les éléments <select> liés au statut de livraison
+    const selects = document.querySelectorAll("select[name='statut_livraison']");
+    
+    // Parcours chaque <select> pour y ajouter un gestionnaire d'événement
+    selects.forEach(select => {
+        select.addEventListener("change", (event) => {
+            // Récupère l'ID de livraison à partir de l'ID de l'élément <select>
+            const livraisonId = select.id.split("_")[2]; // Ex: statut_livraison_1 -> 1
+            
+            // Appelle la fonction pour mettre à jour le statut
+            updateLivraison(livraisonId);
+        });
+    });
+}
+
+// Appelle la fonction après le rendu initial de la page
+document.addEventListener("DOMContentLoaded", () => {
+    attachEventHandlersToSelects();
+});
+
+// Fonction pour mettre à jour le statut
 function updateLivraison(livraisonId) {
     const statut = document.getElementById(`statut_livraison_${livraisonId}`).value;
-    console.log("<<<<<<ccacacacacacacacaac");
+
+    console.log(`Mise à jour du statut pour livraison ID ${livraisonId} avec le statut "${statut}"`);
+
     fetch(`/api/livraisonUpdate`, {
-        method: 'PUT',  
+        method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
         },
@@ -156,11 +181,18 @@ function updateLivraison(livraisonId) {
             statut_livraison: statut
         })
     })
-    .then(response => response.json())
-    .then(data => {
-        console.log('Statut mis à jour:', data);
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`Erreur réseau : ${response.status} ${response.statusText}`);
+        }
+        return response.json();
     })
-    .catch(error => console.error('Erreur lors de la mise à jour:', error));
+    .then(data => {
+        console.log('Statut mis à jour avec succès:', data);
+    })
+    .catch(error => {
+        console.error('Erreur lors de la mise à jour:', error);
+    });
 }
 
 // Ajoute un nouveau chauffeur
