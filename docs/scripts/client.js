@@ -140,7 +140,7 @@ function updateLivraison(livraisonId) {
     console.log(`Mise à jour du statut pour livraison ID ${livraisonId} avec le statut "${statut}"`);
 
     fetch(`/api/livraisonUpdate`, {
-        method: 'PUT',
+        method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },

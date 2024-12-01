@@ -280,7 +280,7 @@ app.post('/api/livraisonAdd', async (req, res) => {
   await AddSQL(req, res, 'livraison');
 });
 
-app.put('/api/livraisonUpdate', async (req, res) => {
+app.post('/api/livraisonUpdate', async (req, res) => {
   const { livraison_id, statut_livraison } = req.body;
   const query = `
       UPDATE livraison
