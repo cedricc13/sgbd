@@ -93,11 +93,12 @@ function generateTableHTML(attributes, entreeList) {
             }
         });
         contentHTML += `</div>`;
-        const id = `${table}_id`;
+        const tableId = `${table}_id`;  
+        const entreeId = entree[`${tableId}`];  
         contentHTML += `
         <button 
             class="delete-btn" 
-            data-id="${entree.id}" 
+            data-id="${entreeId}" 
             data-table="${table}">
             Supprimer
         </button>`;
