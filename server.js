@@ -132,7 +132,7 @@ async function SelectSQL(res, table, filteredAttributes) {
             data: row // Données complètes de la ligne
         };
     });
-    console.log(responseData);
+    // console.log(responseData);
     return res.json(responseData); // Retourne l'objet enrichi
 } catch (err) {
     console.error('Erreur lors de la récupération des données :', err);
