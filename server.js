@@ -648,7 +648,7 @@ app.delete('/api/delete', async (req, res) => {
   console.log('ID à supprimer:', id);
 
   try {
-      const query = `DELETE FROM ${table} WHERE id = $1`;
+      const query = `DELETE FROM ${table} WHERE ${table}_id = $1`;
       await pool.query(query, [id]); // Remplace `db.query` par votre méthode d'accès à la base de données
       return res.status(200).json({ success: true, message: `Élément supprimé de la table ${table}` });
   } catch (error) {
