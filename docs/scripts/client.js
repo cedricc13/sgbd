@@ -59,9 +59,9 @@ function generateTableHTML(attributes, entreeList) {
     });
     contentHTML += `</div>`; 
     console.log("data :" + entreeList[0]);
-    const data = entreeList[data];
+    const dataEntreeList = entreeList[data];
     contentHTML += `<div class="table-data">`;
-    data.forEach(entree => {
+    dataEntreeList.forEach(entree => {
         contentHTML += `<div class='ligne entree'>`;  
         attributes.forEach(attribute => {
             if (attribute === 'camion_id') attribute = 'immatriculation';
