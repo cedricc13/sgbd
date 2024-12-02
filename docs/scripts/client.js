@@ -92,6 +92,7 @@ function generateTableHTML(attributes, entreeList) {
             }
         });
         contentHTML += `</div>`;  
+        const id = `${table}_id`;
         contentHTML += `
         <button 
             class="delete-btn" 
