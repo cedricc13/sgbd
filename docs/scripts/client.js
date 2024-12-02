@@ -465,3 +465,13 @@ async function addContenir() {
     await addToTable('contenir', data);
     console.log('Client : contenir ajouté');
 }
+
+//Requetes Spéciales
+const selectRequestSpecial = document.getElementById("selectreqspecial"); 
+ 
+async function specialRequests() {
+     console.log(selectRequestSpecial.value); 
+    if(selectRequestSpecial.value === 'param') {
+         console.log('requete paramétrée selectionnée'); 
+    }
+}
