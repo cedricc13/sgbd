@@ -58,7 +58,7 @@ function generateTableHTML(attributes, entreeList) {
         contentHTML += `<p class='ligne entete'>${attribute}</p>`;
     });
     contentHTML += `</div>`; 
-    console.log("data :" + entreeList[0]);
+    console.log("data :" + entreeList[0][0]);
     const dataEntreeList = entreeList[data];
     contentHTML += `<div class="table-data">`;
     dataEntreeList.forEach(entree => {
