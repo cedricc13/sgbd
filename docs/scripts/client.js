@@ -48,6 +48,7 @@ function getAttributesTicked(table) {
 }
 
 function generateTableHTML(attributes, entreeList) {
+    const table = entreeList.table;  
     attributes = attributes.filter(attribute => attribute && attribute.trim() !== '');
     let contentHTML = `<div class='ligne nomsattributs'>`;  
     attributes.forEach(attribute => {
@@ -91,13 +92,13 @@ function generateTableHTML(attributes, entreeList) {
                 contentHTML += `<p class='attribut'>${value}</p>`;  
             }
         });
-        contentHTML += `</div>`;  
+        contentHTML += `</div>`;
         const id = `${table}_id`;
         contentHTML += `
         <button 
             class="delete-btn" 
             data-id="${entree.id}" 
-            data-table="${entreeList.table}">
+            data-table="${table}">
             Supprimer
         </button>`;
         contentHTML += `</div>`; 
