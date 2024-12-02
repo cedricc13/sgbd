@@ -639,8 +639,11 @@ app.post('/api/contenirAdd', async (req, res) => {
 
 // Suppression générique
 app.delete('/api/:tableDelete', async (req, res) => {
+  console.log("req:", req);
   const { table } = req.params;
   const { id } = req.body;
+  console.log('Table à supprimer:', table);
+  console.log('ID à supprimer:', id);
 
   if (!id) {
       return res.status(400).json({ error: "ID manquant dans la requête" });
