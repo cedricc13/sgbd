@@ -81,7 +81,7 @@ async function SelectSQL(res, table, filteredAttributes) {
   
     // Construction de la requête avec jointures et alias pour les tables depot
     query = `
-      SELECT ${attr}, id_livraison
+      SELECT ${attr}, livraison_id
       FROM livraison 
       JOIN camion ON livraison.camion_id = camion.camion_id
       JOIN chauffeur ON livraison.chauffeur_id = chauffeur.chauffeur_id
