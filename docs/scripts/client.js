@@ -204,6 +204,8 @@ async function displayTable(table) {
         }
 
         const entreeList = await response.json();
+        console.log(entreeList);
+        console.log(entreeList[0]);
 
         // Récupération du conteneur pour afficher les données
         const tableList = document.getElementById(`${table}-list`);
