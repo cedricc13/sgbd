@@ -125,14 +125,14 @@ async function SelectSQL(res, table, filteredAttributes) {
     console.log(result.rows);
 
     // Construction de la réponse JSON
-    const responseData = result.rows.map(row => {
-        return {
-            table: table, // Nom de la table
-            data: row // Données complètes de la ligne
-        };
-    });
-    // console.log(responseData);
-    return res.json(responseData); // Retourne l'objet enrichi
+    const responseData = {
+      table: table, // Nom de la table
+      data: result.rows // Toutes les données de la requête
+    };
+
+    // Retourner la réponse
+    return res.json(responseData);
+    
 } catch (err) {
     console.error('Erreur lors de la récupération des données :', err);
     return res.status(500).json({ error: 'Erreur lors de la récupération des données.' });

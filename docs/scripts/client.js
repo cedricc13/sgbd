@@ -59,7 +59,7 @@ function generateTableHTML(attributes, entreeList) {
     });
     contentHTML += `</div>`; 
     console.log(JSON.stringify(entreeList, null, 2));
-    const dataEntreeList = entreeList[data];
+    const dataEntreeList = entreeList.data;;
     contentHTML += `<div class="table-data">`;
     dataEntreeList.forEach(entree => {
         contentHTML += `<div class='ligne entree'>`;  
@@ -96,7 +96,7 @@ function generateTableHTML(attributes, entreeList) {
         <button 
             class="delete-btn" 
             data-id="${entree.id}" 
-            data-table="${entree.table}">
+            data-table="${entreeList.table}">
             Supprimer
         </button>`;
         contentHTML += `</div>`; 
