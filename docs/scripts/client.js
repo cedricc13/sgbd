@@ -126,10 +126,10 @@ document.addEventListener('click', async function(event) {
         if (id && table) {
             if (confirm(`Voulez-vous vraiment supprimer cet élément ?`)) {
                 try {
-                    const response = await fetch(`/api/${table}Delete`, {
+                    const response = await fetch(`/api/delete`, {
                         method: 'DELETE',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ id })
+                        body: JSON.stringify({ id, table})
                     });
 
                     if (!response.ok) throw new Error('Erreur lors de la suppression');

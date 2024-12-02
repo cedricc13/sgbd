@@ -638,16 +638,14 @@ app.post('/api/contenirAdd', async (req, res) => {
 });
 
 // Suppression générique
-app.delete('/api/:tableDelete', async (req, res) => {
+app.delete('/api/delete', async (req, res) => {
   console.log("req:", req);
-  const { table } = req.params;
-  const { id } = req.body;
+  const { id, table } = req.body;
+  if (!id || !table) {
+    return res.status(400).json({ error: 'ID et table sont requis' });
+  }
   console.log('Table à supprimer:', table);
   console.log('ID à supprimer:', id);
-
-  if (!id) {
-      return res.status(400).json({ error: "ID manquant dans la requête" });
-  }
 
   try {
       const query = `DELETE FROM ${table} WHERE id = $1`;
