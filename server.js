@@ -81,7 +81,7 @@ async function SelectSQL(res, table, filteredAttributes) {
   
     // Construction de la requête avec jointures et alias pour les tables depot
     query = `
-      SELECT ${attr}
+      SELECT ${attr}, id_livraison
       FROM livraison 
       JOIN camion ON livraison.camion_id = camion.camion_id
       JOIN chauffeur ON livraison.chauffeur_id = chauffeur.chauffeur_id
@@ -98,7 +98,7 @@ async function SelectSQL(res, table, filteredAttributes) {
 
     // Construction de la requête avec jointures
     query = `
-      SELECT ${attr} 
+      SELECT ${attr}, infraction_id 
       FROM infraction 
       JOIN chauffeur ON infraction.chauffeur_id = chauffeur.chauffeur_id
     `;
@@ -112,7 +112,7 @@ async function SelectSQL(res, table, filteredAttributes) {
 
     // Construction de la requête avec jointures
     query = `
-      SELECT ${attr} 
+      SELECT ${attr}, absence_id
       FROM absence 
       JOIN chauffeur ON absence.chauffeur_id = chauffeur.chauffeur_id
     `;
@@ -128,7 +128,6 @@ async function SelectSQL(res, table, filteredAttributes) {
     const responseData = result.rows.map(row => {
         return {
             table: table, // Nom de la table
-            id: row[`${table}_id`] || null, // Identifiant dynamique, ou null s'il n'existe pas
             data: row // Données complètes de la ligne
         };
     });

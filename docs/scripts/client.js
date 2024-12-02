@@ -58,8 +58,8 @@ function generateTableHTML(attributes, entreeList) {
         contentHTML += `<p class='ligne entete'>${attribute}</p>`;
     });
     contentHTML += `</div>`; 
-    console.log("data :" + entreeList);
-    const data = entreeList.data;
+    console.log("data :" + entreeist[data]);
+    const data = entreeList[data];
     contentHTML += `<div class="table-data">`;
     data.forEach(entree => {
         contentHTML += `<div class='ligne entree'>`;  
@@ -204,8 +204,6 @@ async function displayTable(table) {
         }
 
         const entreeList = await response.json();
-        console.log(entreeList);
-        console.log(entreeList[0]);
 
         // Récupération du conteneur pour afficher les données
         const tableList = document.getElementById(`${table}-list`);
