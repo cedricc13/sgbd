@@ -52,12 +52,13 @@ function generateTableHTML(attributes, entreeList) {
         if (attribute === 'depot_arrivee_id') attribute = 'intitule_depot_arrivee';
         contentHTML += `<p class='ligne entete'>${attribute}</p>`;
     });
+     contentHTML += `<p class='ligne entete'>Modifications</p>`
     contentHTML += `</div>`; 
     console.log(JSON.stringify(entreeList, null, 2));
 
     console.log("MODIFHTML"); 
     console.log(entreeList); 
-    const dataEntreeList = entreeList.data;;
+    const dataEntreeList = entreeList.data;
     contentHTML += `<div class="table-data">`;
     dataEntreeList.forEach(entree => {
         contentHTML += `<div class='ligne entree'>`;  
@@ -71,30 +72,24 @@ function generateTableHTML(attributes, entreeList) {
             if (attribute === "statut_livraison") {
                 const selectId = `statut_livraison_${entree.livraison_id}`;
                 contentHTML += `
-                    <div class="statut-container">
-                        <select class='attribut' name='statut_livraison' id='${selectId}'>
+                    <p class="attribut statut-container">
+                        <select class="attribut selectlivraisonstate" name='statut_livraison' id='${selectId}' data-livraison-id='${entree.livraison_id}'>
                             <option value='En attente' ${entree.statut_livraison === 'En attente' ? 'selected' : ''}>En attente</option>
                             <option value='En cours' ${entree.statut_livraison === 'En cours' ? 'selected' : ''}>En cours</option>
                             <option value='Terminée' ${entree.statut_livraison === 'Terminée' ? 'selected' : ''}>Terminée</option>
                         </select>
-                        <button 
-                            class='modifier-btn' 
-                            data-livraison-id='${entree.livraison_id}'>
-                            Modifier
-                        </button>                    
-                    </div>`;
+                    </p>`;
             } else {
                 contentHTML += `<p class='attribut'>${value}</p>`;  
             }
         });
         const tableId = `${table}_id`;  
         const entreeId = entree[`${tableId}`];
-        contentHTML += `</div>`;
         if (table){
             contentHTML += `
-            <div class="button-container">
+            <p class="attribut button-container modifbuttoncontainer">
             <button 
-                class="delete-btn" 
+                class="delete-btn modifbutton" 
                 data-id="${entreeId}" 
                 data-table="${table}">
                 Supprimer
@@ -102,13 +97,13 @@ function generateTableHTML(attributes, entreeList) {
             if (table === 'livraison') {
                 contentHTML += `
                 <button 
-                    class="show-btn" 
+                    class="show-btn modifbutton" 
                     data-id="${entreeId}" 
                     data-table="${table}">
                     Voir les produits
                 </button>
                 <button 
-                    class="addproduct-btn" 
+                    class="addproduct-btn modifbutton" 
                     data-id="${entreeId}" 
                     data-table="${table}">
                     Ajouter des produits à la livraison
@@ -117,14 +112,17 @@ function generateTableHTML(attributes, entreeList) {
             if (table === "depot"){
                 contentHTML += `
                 <button 
-                    class="show-btn" 
+                    class="show-btn modifbutton" 
                     data-id="${entreeId}" 
                     data-table="${table}">
                     Voir les distances aux autres dépôts
                 </button>`;
             }
-            contentHTML += `</div>`;
+            contentHTML += `</p>`;
         }
+        
+        
+        
         contentHTML += `</div>`;
     });
 
@@ -246,9 +244,11 @@ function addProductToLivraison(idLivraison){
 }
 
 // Gestionnaire d'événements global pour les boutons "Modifier"
-document.addEventListener('click', function(event) {
-    if (event.target.matches('.modifier-btn')) {
+document.addEventListener('change', function(event) {
+    
+    if (event.target.matches('.selectlivraisonstate')) {
         const livraisonId = event.target.getAttribute('data-livraison-id');
+        console.log(livraisonId); 
         if (livraisonId) {
             updateLivraison(livraisonId);
         }

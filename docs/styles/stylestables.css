@@ -90,3 +90,37 @@
 .tablesql {
     width: 100%;
 }
+
+
+
+.modifbuttoncontainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: stretch;
+}
+
+.modifbutton {
+    margin: none;
+    cursor: pointer;
+    overflow: hidden;
+    color: black;
+    display: block;
+    transition: transform 0.3s ease;
+    background-color: lightgray;
+    box-sizing: border-box;
+    height: min-content;
+}
+
+.selectlivraisonstate {
+    align-items: center;
+    justify-content: center;
+}
+
+.statut-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    margin-top: 10px;
+    margin-left: 8px;
+}

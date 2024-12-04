@@ -190,7 +190,7 @@ h2 {
     align-items: center; /* Centre verticalement les boutons */
 }
 
-button {
+button:not(.modifbutton) {
     position: relative;
     padding: 10px 20px;
     cursor: pointer;
@@ -262,7 +262,7 @@ a > span {
 }
 
 .smallbouton {
-    width: 45px;
+    width: 84px;
     height: 27px;
     margin-right: -8px;
     margin-top: 1px;
