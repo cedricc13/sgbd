@@ -204,8 +204,9 @@ async function handleColumnChange() {
         const table2 = document.getElementById('table2-select').value;
         
         const url = table === "crossJoin"
-            ? `/api/values?table1=${table1}&table2=${table2}`
+            ? `/api/values?table1=${table1}&table2=${table2}&column=${column}`
             : `/api/values?table=${table}&column=${column}`;
+
 
         const valueResponse = await fetch(url);
         const values = await valueResponse.json();
@@ -444,7 +445,7 @@ async function loadTablesIntoCrossJoinSelects() {
 
 
 
-function generateTableHTML(attributes, results) {
+function generateTableHTMLAdvanced(attributes, results) {
     attributes = attributes.filter(attribute => attribute && attribute.trim() !== '');
     let contentHTML = `<div class='ligne nomsattributs'>`;  
     attributes.forEach(attribute => {
@@ -505,7 +506,7 @@ function displayResults(results) {
 
     // Génère le contenu HTML en utilisant generateTableHTML
     console.log(attributes, results); 
-    const tableHTML = generateTableHTML(attributes, results);
+    const tableHTML = generateTableHTMLAdvanced(attributes, results);
 
     
     document.getElementById('resultat-list').innerHTML = tableHTML;

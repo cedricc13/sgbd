@@ -2,7 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const { Pool } = require('pg');  //Pour psql
 const app = express();
-const port = process.env.PORT || 10000;
+const port = 8080;  
 
 
 
@@ -814,10 +814,12 @@ async function getColumns(tableName) {
 
 
 
-
 async function getValues(tableName, columnName, table1 = null, table2 = null) {
+  if (!columnName) {
+      throw new Error('Le paramètre columnName est requis pour récupérer des valeurs.');
+  }
 
-  const query = tableName === "crossJoin" && table1 && table2 
+  const query = tableName === "crossJoin" && table1 && table2
       ? `SELECT DISTINCT ${columnName} FROM ${table1} CROSS JOIN ${table2} LIMIT 100`
       : `SELECT DISTINCT ${columnName} FROM ${tableName} LIMIT 100`;
 
@@ -844,11 +846,24 @@ app.get('/api/columns', async (req, res) => {
   res.json(columns);
 });
 
+
+
 app.get('/api/values', async (req, res) => {
   const { table, column, table1, table2 } = req.query;
-  const values = await getValues(table, column, table1, table2);
-  res.json(values);
+
+  if (table === "crossJoin" && (!table1 || !table2 || !column)) {
+      return res.status(400).json({ error: "Les paramètres table1, table2 et column sont requis pour un produit cartésien." });
+  }
+
+  try {
+      const values = await getValues(table, column, table1, table2);
+      res.json(values);
+  } catch (error) {
+      console.error("Erreur API /api/values:", error);
+      res.status(500).json({ error: "Erreur lors de la récupération des valeurs." });
+  }
 });
+
 
 
 app.post('/api/execute-query', async (req, res) => {
