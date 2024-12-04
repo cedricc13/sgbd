@@ -29,12 +29,6 @@ manageSelectAll('depot');
 manageSelectAll('produit');
 manageSelectAll('infraction');
 manageSelectAll('absence');
-manageSelectAll('marque');
-manageSelectAll('modele');
-manageSelectAll('appartenir');
-manageSelectAll('conduire');
-manageSelectAll('distance');
-manageSelectAll('contenir');
 
 
 
@@ -60,6 +54,9 @@ function generateTableHTML(attributes, entreeList) {
     });
     contentHTML += `</div>`; 
     console.log(JSON.stringify(entreeList, null, 2));
+
+    console.log("MODIFHTML"); 
+    console.log(entreeList); 
     const dataEntreeList = entreeList.data;;
     contentHTML += `<div class="table-data">`;
     dataEntreeList.forEach(entree => {
@@ -69,9 +66,7 @@ function generateTableHTML(attributes, entreeList) {
             if (attribute === 'chauffeur_id') attribute = 'nom_chauffeur';
             if (attribute === 'depot_depart_id') attribute = 'intitule_depot_depart';
             if (attribute === 'depot_arrivee_id') attribute = 'intitule_depot_arrivee';
-            
-            const value = entree[attribute] || '';
-
+            const value = entree[attribute.toString()] || '';
             // Si c'est le statut de livraison, ajoute le select et le bouton
             if (attribute === "statut_livraison") {
                 const selectId = `statut_livraison_${entree.livraison_id}`;
@@ -92,20 +87,162 @@ function generateTableHTML(attributes, entreeList) {
                 contentHTML += `<p class='attribut'>${value}</p>`;  
             }
         });
-        contentHTML += `</div>`;
         const tableId = `${table}_id`;  
-        const entreeId = entree[`${tableId}`];  
-        contentHTML += `
-        <button 
-            class="delete-btn" 
-            data-id="${entreeId}" 
-            data-table="${table}">
-            Supprimer
-        </button>`;
-        contentHTML += `</div>`; 
+        const entreeId = entree[`${tableId}`];
+        contentHTML += `</div>`;
+        if (table){
+            contentHTML += `
+            <div class="button-container">
+            <button 
+                class="delete-btn" 
+                data-id="${entreeId}" 
+                data-table="${table}">
+                Supprimer
+            </button>`;
+            if (table === 'livraison') {
+                contentHTML += `
+                <button 
+                    class="show-btn" 
+                    data-id="${entreeId}" 
+                    data-table="${table}">
+                    Voir les produits
+                </button>
+                <button 
+                    class="addproduct-btn" 
+                    data-id="${entreeId}" 
+                    data-table="${table}">
+                    Ajouter des produits à la livraison
+                </button>`;
+            }
+            if (table === "depot"){
+                contentHTML += `
+                <button 
+                    class="show-btn" 
+                    data-id="${entreeId}" 
+                    data-table="${table}">
+                    Voir les distances aux autres dépôts
+                </button>`;
+            }
+            contentHTML += `</div>`;
+        }
+        contentHTML += `</div>`;
     });
 
     return contentHTML;
+}
+
+function openPopup(contentHTML) {
+    const popup = document.getElementById('popup');
+    const popupData = document.getElementById('popup-data');
+    popupData.innerHTML = contentHTML; // Insère le contenu dynamique dans la popup
+    popup.classList.remove('hidden'); // Affiche la popup
+}
+
+document.getElementById('popup-close').addEventListener('click', closePopup);
+
+function closePopup() {
+    const popup = document.getElementById('popup');
+    popup.classList.add('hidden'); // Masque la popup
+}
+
+// Gestionnaire d'événements pour le bouton "show"
+document.addEventListener('click', async function(event) {
+    if (event.target.matches('.show-btn')) {
+        const id = event.target.getAttribute('data-id');
+        const table = event.target.getAttribute('data-table');
+        let attributes = "nom_produit,quantite,poids"; // Attributs à récupérer pour les produits
+        if (table === 'depot') {
+            attributes = "autre_depot_nom,autre_depot_ville,distance_km";
+        }
+        
+        // Appel API pour récupérer les données
+        try {
+            const response = await fetch(`/api/${table}/details`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ id, table })
+            });
+
+            if (!response.ok) {
+                throw new Error('Erreur lors de la récupération des données');
+            }
+
+            const data = await response.json();
+            // Générer le HTML pour afficher les données
+            let contentHTML;
+            if (table === 'produit') {
+                contentHTML = `<h2>Détails des produits</h2>`;
+            }
+            if (table === 'depot') {
+                contentHTML = `<h2>Détails des distances aux autres dépôts</h2>`;
+            }
+            contentHTML += generateTableHTML(attributes.split(','), data);
+            // Ouvrir le popup avec les données
+            openPopup(contentHTML);
+        } catch (error) {
+            console.error('Erreur:', error);
+            alert('Impossible de charger les données');
+        }
+    }
+    if (event.target.matches('.addproduct-btn')) {
+        const id = event.target.getAttribute('data-id');
+        if (!id) {
+            console.error("ID de livraison introuvable ou invalide.");
+            return;
+        }    
+        let contentHTML = `
+        <div class="form-container">
+            <h2>Ajouter un produit à la livraison</h2>
+            <label for="produit_id_sel_pop">Produit</label>
+            <select id="produit_id_sel_pop">
+            </select><br>
+            <label for="quantite_pop">Quantité</label>
+            <input type="number" id="quantite_pop" name="quantite" required>
+            <button onclick="addProductToLivraison('${String(id)}')">Ajouter</button>`;
+        openPopup(contentHTML);
+        loadDropdowns('produit', 'produit_id_sel_pop');
+    }
+});
+
+function addProductToLivraison(idLivraison){
+    const product = document.getElementById("produit_id_sel_pop");
+    if (!product) {
+        console.error("Element produit_id introuvable pour produit");
+        return;
+    }
+    const produit_id = product.value;
+    const quantite = document.getElementById("quantite_pop").value;
+    if (quantite <= 0) {
+        alert("La quantité doit être supérieure à 0");
+        return;
+    }
+    console.log(`Ajout du produit ${produit_id} à la livraison ${idLivraison} avec quantité ${quantite}`);
+    try{
+        fetch(`/api/livraison/addproduct`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ idLivraison, produit_id, quantite })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Erreur réseau : ${response.status} ${response.statusText}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Produit ajouté avec succès:', data);
+            alert(`Produit ajouté avec succès à la livraison #${idLivraison}`);
+            closePopup();
+        })
+    }
+    catch(error){
+        console.error('Erreur lors de l\'ajout du produit:', error);
+        alert(`Erreur lors de l'ajout du produit à la livraison #${idLivraison}`);
+    }
 }
 
 // Gestionnaire d'événements global pour les boutons "Modifier"
@@ -117,6 +254,7 @@ document.addEventListener('click', function(event) {
         }
     }
 });
+
 
 document.addEventListener('click', async function(event) {
     if (event.target.matches('.delete-btn')) {
@@ -226,7 +364,7 @@ async function displayTable(table) {
 }
 
 
-// Ajoute un nouveau chauffeur
+// Ajoute à une table
 async function addToTable(table, attributs) {
     const bodyData = {};
     Object.keys(attributs).forEach(attribute => {
@@ -237,15 +375,16 @@ async function addToTable(table, attributs) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(bodyData)
     });
-
+    console.log(response);
     if (!response.ok) console.error('Erreur lors de l\'ajout de l\'élément');
-    else console.log('Élément ajouté avec succès');
+    else alert('Élément ajouté avec succès');
     displayTable(table); 
 }
 
 // Fonction pour charger les options du menu déroulant pour différentes tables
 function loadDropdowns(table, elementId) {
     const url = `/api/${table}/ids`;
+    console.log(`Chargement des ${table}s depuis ${url}`);
 
     fetch(url)
         .then(response => {
@@ -263,12 +402,20 @@ function loadDropdowns(table, elementId) {
             data.forEach(elt => {
                 const option = document.createElement('option');
                 option.value = elt.id;
-                option.textContent = `#${elt.nom}`;
+                if (table === 'produit') {
+                    option.textContent = `${elt.nom} (${String(elt.poids)} kg)`;
+                }
+                else{
+                    option.textContent = `#${elt.nom}`;
+                }
                 eltSelect.appendChild(option);
             });
         })
         .catch(error => console.error(`Erreur lors du chargement des ${table}s:`, error));
 }
+
+//Pour insertion dans camion
+loadDropdowns('modele', 'nom_modele_sel');
 
 // Pour insertion dans livraison
 loadDropdowns('chauffeur', 'chauffeur_id_sel_1');  
@@ -280,26 +427,7 @@ loadDropdowns('depot','depot_arrivee_id_sel');
 loadDropdowns('chauffeur', 'chauffeur_id_sel_2');  
 
 // Dans absences
-loadDropdowns('chauffeur', 'chauffeur_id_sel_3'); 
-
-//Dans modèles 
-loadDropdowns('marque', 'marque_id_sel');
-
-// Appartenir
-loadDropdowns('modele', 'modele_id_sel');
-loadDropdowns('camion', 'camion_id_sel_2')
-
-// Conduire 
-loadDropdowns('chauffeur', 'chauffeur_id_sel_4'); 
-loadDropdowns('camion', 'camion_id_sel_3');
-
-// Distance 
-loadDropdowns('depot', 'depot_id_sel_1'); 
-loadDropdowns('depot', 'depot_id_sel_2'); 
-
-//Contenir
-loadDropdowns('livraison', 'livraison_id_sel'); 
-loadDropdowns('produit', 'produit_id_sel'); 
+loadDropdowns('chauffeur', 'chauffeur_id_sel_3');  
 
 
 // CHAUFFEURS
@@ -326,7 +454,8 @@ async function addCamion() {
         date_achat: document.getElementById("date_achat").value,
         kilometrage: document.getElementById("kilometrage").value,
         capacite: document.getElementById("capacite").value,
-        etat: document.getElementById("etat").value
+        etat: document.getElementById("etat").value,
+        modele: document.getElementById("nom_modele_sel").value
     };
     console.log(Object.values(attributs)); 
     // Appel à la fonction d'ajout générique (ici addToTable avec 'camion' comme table)
@@ -468,10 +597,141 @@ async function addContenir() {
 
 //Requetes Spéciales
 const selectRequestSpecial = document.getElementById("selectreqspecial"); 
+const selectParam = document.getElementById('selectparam'); 
+const selectParamTitle = document.getElementById('selectparamtitle'); 
+const specialReqParamContainer = document.getElementById('specialreqparamcontainer'); 
  
-async function specialRequests() {
-     console.log(selectRequestSpecial.value); 
-    if(selectRequestSpecial.value === 'param') {
-         console.log('requete paramétrée selectionnée'); 
+async function specialRequestsSelection() {
+    const selectedOption = selectRequestSpecial.selectedOptions[0]; 
+    console.log("Valeur sélectionnée :", selectedOption.value);
+    console.log("Classe de l'option sélectionnée :", selectedOption.className);
+
+    if (selectedOption.className === "param") {
+        specialReqParamContainer.style.justifyContent="none"; 
+
+        selectParam.style.display = "block"; 
+        loadDropdowns('depot', 'selectparam'); 
+        selectParamTitle.style.display = "block"; 
+        if(selectedOption.value == 4){
+            selectParamTitle.innerText = "Selectionnez le paramètre destination de votre requête"; 
+        }else if (selectedOption.value==5) {
+            selectParamTitle.innerText = "Selectionnez le paramètre dépot de votre requête"; 
+        }
+    } else if (selectedOption.className === "!param") {
+        specialReqParamContainer.style.justifyContent="center";
+        selectParam.style.display = "none"; 
+        selectParamTitle.style.display = "none"; 
     }
 }
+
+function generateTableHTMLFromResponseForSpecial(dataEntreeList, selectedOption) {
+    if (!dataEntreeList || dataEntreeList.length === 0) {
+        return `<p>Aucun résultat à afficher.</p>`;
+    }
+
+    // Mappage des attributs pour les noms d'attributs plus compréhensibles
+    const attributeMapping = {
+        'camion_id': 'immatriculation',
+        'chauffeur_id': 'nom_chauffeur',
+        'depot_depart_id': 'intitule_depot_depart',
+        'depot_arrivee_id': 'intitule_depot_arrivee'
+    };
+
+    // Récupération des attributs
+    let attributes = Object.keys(dataEntreeList[0]);
+    console.log(attributes); 
+
+    // Créer la ligne d'entête
+    let contentHTML = `<div class='ligne nomsattributs'>`;  
+    attributes.forEach(attribute => {
+        const normalizedAttribute = attributeMapping[attribute] || attribute;  // Utilisation du mappage si disponible
+        contentHTML += `<p class='ligne entete'>${normalizedAttribute}</p>`;
+    });
+    contentHTML += `</div>`; 
+
+    contentHTML += `<div class="table-data">`;
+
+    // Parcours des données
+    dataEntreeList.forEach(entree => {
+        contentHTML += `<div class='ligne entree'>`;  
+        attributes.forEach(attribute => {
+            const normalizedAttribute = attributeMapping[attribute] || attribute;  // Utilisation du mappage si disponible
+            let value = entree[normalizedAttribute] || '';  // Récupère la valeur, ou vide si elle est absente
+
+            console.log(`Attribut: ${normalizedAttribute}, Valeur: ${value}`); 
+
+            contentHTML += `<p class='attribut'>${value}</p>`;  
+        });
+        contentHTML += `</div>`;
+    });
+
+    contentHTML += `</div>`;
+    return contentHTML;
+}
+
+
+// async function IdToValue(id,table){
+//     const url = `api/${table}/ids`;
+//     console.log(`Chargement des ${table}s depuis ${url}`);
+
+//     try {
+//         const response = await fetch(url);
+//         console.log(`Statut HTTP pour ${url} : ${response.status}`);
+//         if (!response.ok) throw new Error(`Erreur HTTP ! statut : ${response.status}`);
+//         const data = await response.json();
+//         const elt = data.find(elt => elt.id == id);
+//         console.log(elt);
+//         console.log(elt.nom);
+//         return elt.nom; 
+//     } catch (error) {
+//         console.error(`Erreur lors du chargement des ${table}s:`, error);
+//     }
+// }
+
+async function sendSpecialRequest() {
+    const selectedOption = selectRequestSpecial.selectedOptions[0];
+    const selectedOptionValue = selectedOption.value;
+    const selectedOptionClass = selectedOption.className;
+    const reqSpecialList = document.getElementById('reqspecial-list');
+
+    const requestData = {
+        requestType: selectedOptionValue
+    };
+
+    if (selectedOptionClass === "param") {
+        const selectedParamValue = selectParam.value;
+        requestData.param = selectedParamValue;
+    }
+
+    const url = `api/specialrequests`;
+    console.log("Données envoyées :", requestData);
+
+    try {
+        const response = await fetch(url, {
+            method: "POST", 
+            headers: {
+                "Content-Type": "application/json" 
+            },
+            body: JSON.stringify(requestData) 
+        });
+
+        console.log(`Statut HTTP pour ${url} : ${response.status}`);
+
+        if (!response.ok) {
+            throw new Error(`Erreur HTTP ! statut : ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log("Réponse du serveur :", data);
+        
+        reqSpecialList.innerHTML = ''; 
+        reqSpecialList.innerHTML = generateTableHTMLFromResponseForSpecial(data.data, selectedOptionValue); 
+
+
+    } catch (error) {
+        console.error("Erreur lors de l'envoi de la requête spéciale :", error);
+    }
+}
+
+
+selectRequestSpecial.addEventListener('change', specialRequestsSelection); 

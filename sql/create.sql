@@ -177,9 +177,9 @@ ALTER TABLE INFRACTION ALTER COLUMN type_infraction SET NOT NULL;
 --   Clés étrangères et actions en cascade
 -- =======================================
 
-ALTER TABLE ABSENCE ADD FOREIGN KEY (chauffeur_id) REFERENCES CHAUFFEUR (chauffeur_id);
+ALTER TABLE ABSENCE ADD FOREIGN KEY (chauffeur_id) REFERENCES CHAUFFEUR (chauffeur_id) ON DELETE CASCADE;
 
-ALTER TABLE INFRACTION ADD FOREIGN KEY (chauffeur_id) REFERENCES CHAUFFEUR (chauffeur_id);
+ALTER TABLE INFRACTION ADD FOREIGN KEY (chauffeur_id) REFERENCES CHAUFFEUR (chauffeur_id) ON DELETE CASCADE;
 
 ALTER TABLE APPARTENIR ADD FOREIGN KEY (camion_id) REFERENCES CAMION (camion_id) ON DELETE CASCADE;
 ALTER TABLE APPARTENIR ADD FOREIGN KEY (modele_id) REFERENCES MODELE (modele_id) ON DELETE CASCADE;
@@ -339,5 +339,44 @@ CREATE TRIGGER trigger_check_chauffeur_disponible
 BEFORE INSERT OR UPDATE ON livraison
 FOR EACH ROW
 EXECUTE FUNCTION check_chauffeur_disponible();
+
+CREATE OR REPLACE FUNCTION check_contenir_poids()
+RETURNS TRIGGER AS $$
+DECLARE
+    poids_total FLOAT;
+    capacite_camion FLOAT;
+BEGIN
+    -- Calculer le poids total actuel des produits dans la livraison (y compris le nouveau produit ou la mise à jour)
+    SELECT SUM(p.poids * c.quantite)
+    INTO poids_total
+    FROM contenir c
+    JOIN produit p ON c.produit_id = p.produit_id
+    WHERE c.livraison_id = NEW.livraison_id;
+
+    -- Récupérer la capacité du camion assigné à la livraison
+    SELECT capacite
+    INTO capacite_camion
+    FROM camion
+    WHERE camion_id = (
+        SELECT camion_id
+        FROM livraison
+        WHERE livraison_id = NEW.livraison_id
+    );
+
+    -- Vérifier si le poids total dépasse la capacité du camion
+    IF poids_total > capacite_camion THEN
+        RAISE EXCEPTION 'Le poids total de la livraison (%.2f) dépasse la capacité du camion (%.2f).',
+            poids_total, capacite_camion;
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE TRIGGER trigger_check_contenir_poids
+AFTER INSERT OR UPDATE OR DELETE ON contenir
+FOR EACH ROW
+EXECUTE FUNCTION check_contenir_poids();
 
 

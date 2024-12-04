@@ -12,6 +12,60 @@ main {
     width: calc(100% - 220px);
 }
 
+/* Masque la popup par défaut */
+.popup.hidden {
+    display: none;
+}
+
+/* Positionnement et style de la popup */
+.popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Arrière-plan semi-transparent */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+#popup-content {
+    position: relative; /* Nécessaire pour positionner des enfants avec "absolute" */
+    width: 400px; /* Exemple : largeur de la popup */
+    margin: 0 auto; /* Centre la popup horizontalement */
+    background: white; /* Couleur de fond de la popup */
+    padding: 20px; /* Espacement interne de la popup */
+    border-radius: 8px; /* Coins arrondis */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Effet d'ombre */
+}
+
+
+#popup-close {
+    position: absolute; /* Place le bouton par rapport à #popup-content */
+    top: 10px; /* Distance du haut du conteneur */
+    right: 10px; /* Distance de la droite du conteneur */
+    background: #f44336; /* Couleur de fond */
+    color: #fff; /* Couleur du texte */
+    border: none; /* Supprime la bordure */
+    border-radius: 50%; /* Rond */
+    width: 30px;
+    height: 30px;
+    cursor: pointer; /* Curseur clic */
+    font-size: 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Effet d'ombre */
+    transition: background 0.3s ease; /* Transition d'effet */
+}
+
+/* Effet au survol */
+#popup-close:hover {
+    background: #d32f2f; /* Change la couleur au survol */
+}
+
 
 h3 {
     display: block;
@@ -121,10 +175,20 @@ h2 {
     background-image: url('../images/credits.png');
 }
 
+#specialbutton {
+    background-image: url('../images/reqspeciales.png');
+}
+
 #moretablesbutton {
     background-image: url('../images/voirplus.avif');
 }
 
+.button-container {
+    display: flex; /* Utilise Flexbox */
+    justify-content: center; /* Centre horizontalement les boutons */
+    gap: 0px; /* Espace entre les boutons */
+    align-items: center; /* Centre verticalement les boutons */
+}
 
 button {
     position: relative;
@@ -137,8 +201,8 @@ button {
     transition: transform 0.3s ease;
     background-color: lightgray;
     box-sizing: border-box;
-    height: min-content
-  }
+    height: min-content;
+}
   
 
 button:hover {
@@ -242,7 +306,7 @@ h4 {
     flex-direction: column; 
     justify-content: space-between; 
     align-items: center; 
-    padding: 20px; 
+    padding: 20px;
 }
 
 .selectioncontainer h4 {
@@ -257,6 +321,7 @@ h4 {
     justify-content: space-evenly; 
     align-items: flex-start; 
     margin-top: 30px;
+    width: 140px; 
 }
 
 .selectioncontainer button {
@@ -346,4 +411,28 @@ input::placeholder {
 #value-container {
     display: flex;
     flex-direction: column;
+}
+
+#special {
+    font-size: 13px;
+    text-align: center;
+}
+
+#selectreqspecial {
+    display: block;
+    font-size: 1em;
+    margin-block-start: 0.83em;
+    margin-block-end: 0.83em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    font-weight: bold;
+    text-shadow: 5px 5px 5px rgba(44, 44, 44, 0.443);
+}
+
+#specialreqparamcontainer {
+    justify-content: center;
+}
+
+#selectparamtitle {
+    margin-bottom: 20px;
 }

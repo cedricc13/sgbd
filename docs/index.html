@@ -30,7 +30,6 @@
     <a href="#" onclick="showSection('sectionrequetesavancees')"  class='bouton' id="boutonrequetesavancees"> <span class="button-text"> Requetes avancées </span></a>
     
     <div id="smallbuttoncontainer">
-        <a href="#" class="bouton smallbouton" id="moretablesbutton" onclick="showSection('sectionmoretables')"> <span class="button-text">plus de tables</span> </a>
         <a href="#" class="bouton smallbouton" id="specialbutton" onclick="showSection('sectionspecial')"> <span class="button-text" id="special">Requêtes Spéciales</span> </a>
         <a href="#" class="bouton smallbouton" id="creditsbutton" onclick="showSection('sectioncredits')"> <span class="button-text">Crédits</span>  </a>
     </div>
@@ -125,6 +124,8 @@
                     <label><input type="checkbox" name="kilometrage" /> Kilométrage</label><br>
                     <label><input type="checkbox" name="capacite" /> Capacité</label><br>
                     <label><input type="checkbox" name="etat" /> État</label><br>
+                    <label><input type="checkbox" name="nom_modele" /> Modèle</label><br>
+                    <label><input type="checkbox" name="nom_marque" /> Marque</label><br>
                 </form>
                 <button type="button" onclick="displayTable('camion')">Afficher</button>
             </div>
@@ -153,6 +154,10 @@
                     <input type="number" id="capacite" placeholder="Capacité">
                     <label for="etat">Etat du camion </label>
                     <input type="text" id="etat" placeholder="État">
+                    <label for="nom_marque">Modèle</label>
+                    <select id="nom_modele_sel">
+                        <option value="">Sélectionnez un modèle</option>
+                    </select>
                 </div>
                 <button onclick="addCamion()">Ajouter Camion</button>
             </div>
@@ -234,6 +239,14 @@
         </div>
     </div>
 
+    <div id="popup" class="popup hidden">
+        <div id="popup-content">
+            <button id="popup-close">X</button>
+            <div id="popup-data">
+                <!-- Contenu dynamique ajouté ici -->
+            </div>
+        </div>
+    </div>
 
     <!-- Section Depot -->
     <div id="sectiondepot" class="section hidden">
@@ -475,272 +488,26 @@
     </div>
 </div>
 
-
-
-
-    
-
-    <!-- Sections Plus de tables-->
-    <div id="sectionmoretables" class="section hidden">
-        <div id="sectionmarque" class="soussection">
-            <h3>MARQUES</h3>
-            <h2>Affichage</h2>
-                <div class="container">
-                    <div class="selectioncontainer souscontainer">
-                        <h4>Sélectionner les attributs à afficher</h4>
-                        <form id="marque-attributs-form">
-                            <label><input type="checkbox" id="selectAllmarque" /> Tout sélectionner</label><br>
-                            <label><input type="checkbox" name="marque_id" /> Id de la marque</label><br>
-                            <label><input type="checkbox" name="nom_marque" /> Nom de la marque</label><br>
-                        </form>
-                        <button type="button" onclick="displayTable('marque')">Afficher</button>
-                    </div>
-
-                    <div class="listcontainer souscontainer tablesql">
-                        <h4>Liste des Marques</h4>
-                        <div id="marque-list" class="list"> </div>
-                    </div>
-                </div>
-            
-            <h2>Insertion</h2>
-            <div class="container souscontainer">
-                <div class = 'inputcontainer'>
-                    <div class="inputzone">
-                        <label for="nom_marque">Nom de la marque</label>
-                            <input type="text" id="nom_marque" placeholder="Nom de la Marque">                    
-                    </div>
-                    <button onclick="addMarque()">Ajouter Marque</button>
-                </div>
-            </div>
-        </div>
-
-        <div id="sectionmodele" class="soussection">
-            <h3>MODELES</h3>
-            <h2>Affichage</h2>
-            <div class="container">
-                <div class="selectioncontainer souscontainer">
-                    <h4>Sélectionner les attributs à afficher</h4>
-                    <form id="modele-attributs-form">
-                        <label><input type="checkbox" id="selectAllmodele" /> Tout sélectionner</label><br>
-                        <label><input type="checkbox" name="modele_id" /> Id du modèle</label><br>
-                        <label><input type="checkbox" name="nom_modele" /> Nom du modèle</label><br>
-                        <label><input type="checkbox" name="marque_id" /> Marque</label><br>
-                    </form>
-                    <button type="button" onclick="displayTable('modeles')">Afficher</button>
-                </div>
-        
-                <div class="listcontainer souscontainer tablesql">
-                    <h4>Liste des Modèles</h4>
-                    <div id="modele-list" class="list"></div>
-                </div>
-            </div>
-        
-            <h2>Insertion</h2>
-            <div class="container souscontainer">
-                <div class="inputcontainer">
-                    <div class="inputzone">
-                        <label for="nom_modele">Nom du Modèle</label>
-                        <input type="text" id="nom_modele" placeholder="Nom du modèle">
-                        <label for="marque_id">Marque</label>
-                        <select id="marque_id_sel">
-                            <option value="">Sélectionnez une marque</option>
-                        </select>
-                    </div>
-                    <button onclick="addModele()">Ajouter Modèle</button>
-                </div>
-            </div>
-        </div>
-        
-        <div id="sectionappartenir" class="soussection">
-            <h3>APPARTENIR</h3>
-            <h2>Affichage</h2>
-            <div class="container">
-                <div class="selectioncontainer souscontainer">
-                    <h4>Sélectionner les attributs à afficher</h4>
-                    <form id="appartenir-attributs-form">
-                        <label><input type="checkbox" id="selectAllappartenir" /> Tout sélectionner</label><br>
-                        <label><input type="checkbox" name="modele_id" /> Id du modèle</label><br>
-                        <label><input type="checkbox" name="camion_id" /> Id du camion</label><br>
-                    </form>
-                    <button type="button" onclick="displayTable('appartenir')">Afficher</button>
-                </div>
-        
-                <div class="listcontainer souscontainer tablesql">
-                    <h4>Liste des Appartenir</h4>
-                    <div id="appartenir-list" class="list"></div>
-                </div>
-            </div>
-        
-            <h2>Insertion</h2>
-            <div class="container souscontainer">
-                <div class="inputcontainer">
-                    <div class="inputzone">
-                        <label for="modele_id_sel">Modèle</label>
-                        <select id="modele_id_sel">
-                            <option value="">Sélectionnez un modèle</option>
-                            <!-- Modele options will be populated dynamically -->
-                        </select>
-                        <label for="camion_id_sel_2">Camion</label>
-                        <select id="camion_id_sel_2">
-                            <option value="">Sélectionnez un camion
-                            </option>
-                            <!-- Camion options will be populated dynamically -->
-                        </select>
-                    </div>
-                    <button onclick="addAppartenir()">Ajouter Appartenance</button>
-                </div>
-            </div>
-        </div>
-        
-        <div id="sectionconduire" class="soussection">
-            <h3>CONDUIRE</h3>
-            <h2>Affichage</h2>
-            <div class="container">
-                <div class="selectioncontainer souscontainer">
-                    <h4>Sélectionner les attributs à afficher</h4>
-                    <form id="conduire-attributs-form">
-                        <label><input type="checkbox" id="selectAllconduire" /> Tout sélectionner</label><br>
-                        <label><input type="checkbox" name="chauffeur_id" /> Id du chauffeur</label><br>
-                        <label><input type="checkbox" name="camion_id" /> Id du camion</label><br>
-                    </form>
-                    <button type="button" onclick="displayTable('conduire')">Afficher</button>
-                </div>
-        
-                <div class="listcontainer souscontainer tablesql">
-                    <h4>Liste des Conducteurs</h4>
-                    <div id="conduire-list" class="list"></div>
-                </div>
-            </div>
-        
-            <h2>Insertion</h2>
-            <div class="container souscontainer">
-                <div class="inputcontainer">
-                    <div class="inputzone">
-                        <label for="chauffeur_id_sel_4">Chauffeur</label>
-                        <select id="chauffeur_id_sel_4">
-                            <option value="">Sélectionnez un chauffeur</option>
-                            <!-- Chauffeur options will be populated dynamically -->
-                        </select>
-                        <label for="camion_id_sel_3">Camion</label>
-                        <select id="camion_id_sel_3">
-                            <option value="">Sélectionnez un camion</option>
-                            <!-- Camion options will be populated dynamically -->
-                        </select>
-                    </div>
-                    <button onclick="addConduire()">Ajouter Conducteur</button>
-                </div>
-            </div>
-        </div>
-        
-        <div id="sectiondistance" class="soussection">
-            <h3>DISTANCE</h3>
-            <h2>Affichage</h2>
-            <div class="container">
-                <div class="selectioncontainer souscontainer">
-                    <h4>Sélectionner les attributs à afficher</h4>
-                    <form id="distance-attributs-form">
-                        <label><input type="checkbox" id="selectAlldistance" /> Tout sélectionner</label><br>
-                        <label><input type="checkbox" name="depot1_id" /> Dépôt 1</label><br>
-                        <label><input type="checkbox" name="depot2_id" /> Dépôt 2</label><br>
-                        <label><input type="checkbox" name="distance" /> Distance</label><br>
-                    </form>
-                    <button type="button" onclick="displayTable('distance')">Afficher</button>
-                </div>
-        
-                <div class="listcontainer souscontainer tablesql">
-                    <h4>Liste des Distances</h4>
-                    <div id="distance-list" class="list"></div>
-                </div>
-            </div>
-        
-            <h2>Insertion</h2>
-            <div class="container souscontainer">
-                <div class="inputcontainer">
-                    <div class="inputzone">
-                        <label for="depot_id_sel_1">Dépôt 1</label>
-                        <select id="depot_id_sel_1">
-                            <option value="">Sélectionnez un dépôt</option>
-                            <!-- Depot options will be populated dynamically -->
-                        </select>
-                        <label for="depot_id_sel_2">Dépôt 2</label>
-                        <select id="depot_id_sel_2">
-                            <option value="">Sélectionnez un dépôt</option>
-                            <!-- Depot options will be populated dynamically -->
-                        </select>
-                        <label for="distance">Distance</label>
-                        <input type="number" id="distance" placeholder="Distance en km">
-                    </div>
-                    <button onclick="addDistance()">Ajouter Distance</button>
-                </div>
-            </div>
-        </div>
-        
-        <div id="sectioncontenir" class="soussection">
-            <h3>CONTENIR</h3>
-            <h2>Affichage</h2>
-            <div class="container">
-                <div class="selectioncontainer souscontainer">
-                    <h4>Sélectionner les attributs à afficher</h4>
-                    <form id="contenir-attributs-form">
-                        <label><input type="checkbox" id="selectAllcontenir" /> Tout sélectionner</label><br>
-                        <label><input type="checkbox" name="livraison_id" /> Id de la livraison</label><br>
-                        <label><input type="checkbox" name="produit_id" /> Id du produit</label><br>
-                        <label><input type="checkbox" name="quantite" /> Quantité</label><br>
-                    </form>
-                    <button type="button" onclick="displayTable('contenir')">Afficher</button>
-                </div>
-        
-                <div class="listcontainer souscontainer tablesql">
-                    <h4>Liste des Contenir</h4>
-                    <div id="contenir-list" class="list"></div>
-                </div>
-            </div>
-        
-            <h2>Insertion</h2>
-            <div class="container souscontainer">
-                <div class="inputcontainer">
-                    <div class="inputzone">
-                        <label for="livraison_id_sel">Livraison</label>
-                        <select id="livraison_id_sel">
-                            <option value="">Sélectionnez une livraison</option>
-                            <!-- Livraison options will be populated dynamically -->
-                        </select>
-                        <label for="produit_id_sel">Produit</label>
-                        <select id="produit_id_sel">
-                            <option value="">Sélectionnez un produit</option>
-                            <!-- Produit options will be populated dynamically -->
-                        </select>
-                        <label for="quantite">Quantité</label>
-                        <input type="number" id="quantite" placeholder="Quantité">
-                    </div>
-                    <button onclick="addContenir()">Ajouter Contenir</button>
-                </div>
-            </div>
-        </div>
-        
-        
-
-    </div>
-
     <div id="sectionspecial" class="section hidden">
         <h3>Requêtes Spéciales</h3>
         <h2>
             <select id="selectreqspecial">
-                <option value="!param"> Moyenne des poids transportés par camion par livraison</option>
-                <option value="!param"> Longueur de la livraison moyenne des chauffeurs</option>
-                <option value="!param"> Classement des chauffeurs</option>
-                <option value="param"> Classement des dépôts les plus proches d’une destination</option>
-                <option value="param"> Classement des camions vides les plus proches d’un dépôt</option>
+                <option value="1" class="!param"> Moyenne des poids transportés par camion par livraison</option>
+                <option value="2" class="!param"> Moyenne des distances parcourues par les chauffeurs pour effectuer une livraison</option>
+                <option value="3" class="!param"> Classement des chauffeurs</option>
+                <option value="4" class="param"> Classement des dépôts les plus proches d’une destination</option>
+                <option value="5" class="param"> Classement des camions vides les plus proches d’un dépôt</option>
+                
             </select>
         </h2>
 
         <div class="container">
-            <div class="selectioncontainer souscontainer">
-                <h4>Selectionnez les paramètres de votre requête </h4>
-                <select id="selectreqspecial" class="hidden">
+            <div class="selectioncontainer souscontainer" id="specialreqparamcontainer">
+                <h4 class="hidden" id="selectparamtitle">Selectionnez les paramètres de votre requête </h4>
+                <select id="selectparam" class="hidden">
                     
                 </select>
-                <button type="button" onclick="specialRequests()">Afficher</button>
+                <button type="button" onclick="sendSpecialRequest()">Afficher</button>
             </div>
 
             <div class="listcontainer souscontainer tablesql">

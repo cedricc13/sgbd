@@ -119,7 +119,11 @@ END $$;
 -- Insérer des livraisons
 INSERT INTO LIVRAISON (statut_livraison, camion_id, chauffeur_id, depot_depart_id, date_prevue_depart, date_effective_depart, depot_arrivee_id, date_prevue_arrivee, date_effective_arrivee) VALUES 
 ('En cours', (SELECT camion_id FROM CAMION LIMIT 1), (SELECT chauffeur_id FROM CHAUFFEUR LIMIT 1),  (SELECT depot_id FROM DEPOT WHERE ville = 'Paris'), '2024-10-10 08:00', '2024-10-10 08:30', (SELECT depot_id FROM DEPOT WHERE ville = 'Marseille'), '2024-10-10 18:00', '2024-10-10 17:45'),
-('Terminée', (SELECT camion_id FROM CAMION LIMIT 1 OFFSET 1), (SELECT chauffeur_id FROM CHAUFFEUR LIMIT 1 OFFSET 1), (SELECT depot_id FROM DEPOT WHERE ville = 'Lyon'), '2024-09-20 09:00', '2024-09-20 09:10', (SELECT depot_id FROM DEPOT WHERE ville = 'Strasbourg'), '2024-09-20 15:00', '2024-09-20 14:45');
+('Terminée', (SELECT camion_id FROM CAMION LIMIT 1 OFFSET 1), (SELECT chauffeur_id FROM CHAUFFEUR LIMIT 1 OFFSET 1), (SELECT depot_id FROM DEPOT WHERE ville = 'Lyon'), '2024-09-20 09:00', '2024-09-20 09:10', (SELECT depot_id FROM DEPOT WHERE ville = 'Strasbourg'), '2024-09-20 15:00', '2024-09-20 14:45'),
+('En attente', (SELECT camion_id FROM CAMION LIMIT 1 OFFSET 2), (SELECT chauffeur_id FROM CHAUFFEUR LIMIT 1 OFFSET 2), (SELECT depot_id FROM DEPOT WHERE ville = 'Paris'), '2024-12-05 08:00', NULL, (SELECT depot_id FROM DEPOT WHERE ville = 'Bordeaux'), '2024-12-05 18:00', NULL),
+('En cours', (SELECT camion_id FROM CAMION LIMIT 1 OFFSET 3), (SELECT chauffeur_id FROM CHAUFFEUR LIMIT 1 OFFSET 3), (SELECT depot_id FROM DEPOT WHERE ville = 'Bordeaux'), '2024-12-06 07:00', '2024-12-06 07:15', (SELECT depot_id FROM DEPOT WHERE ville = 'Strasbourg'), '2024-12-06 19:00', NULL),
+('Terminée', (SELECT camion_id FROM CAMION LIMIT 1 OFFSET 4), (SELECT chauffeur_id FROM CHAUFFEUR LIMIT 1 OFFSET 4), (SELECT depot_id FROM DEPOT WHERE ville = 'Marseille'), '2024-11-01 10:00', '2024-11-01 10:10', (SELECT depot_id FROM DEPOT WHERE ville = 'Paris'), '2024-11-01 15:00', '2024-11-01 14:50');
+
 
 -- Insérer des relations "APPARTENIR" (modèle à camion)
 INSERT INTO APPARTENIR (modele_id, camion_id) 
@@ -131,5 +135,7 @@ SELECT chauffeur_id, camion_id FROM CHAUFFEUR, CAMION LIMIT 5;
 
 -- Insérer des relations "CONTENIR" (livraison à produit)
 INSERT INTO CONTENIR (livraison_id, produit_id, quantite) 
-SELECT livraison_id, produit_id, FLOOR(RANDOM() * 10 + 1) 
-FROM LIVRAISON, PRODUIT LIMIT 5;
+SELECT livraison_id, produit_id, FLOOR(RANDOM() * 5 + 1) 
+FROM LIVRAISON, PRODUIT 
+WHERE RANDOM() < 0.3 -- Réduit la probabilité de sélectionner une combinaison
+LIMIT 3; -- Réduit le nombre total de lignes insérées

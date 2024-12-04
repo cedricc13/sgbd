@@ -2,10 +2,9 @@ require('dotenv').config();
 const express = require('express');
 const { Pool } = require('pg');  //Pour psql
 const app = express();
-const port = process.env.PORT || 10000;
+const port = 8080;  
 
 
-console.log('Connecté à la base de données PostgreSQL');
 
 app.use(express.json());
 
@@ -40,7 +39,11 @@ if (err) {
   release(); 
 });
 
-async function getValidAttributes(table) {
+function randomNumber(min,max){
+  return Math.floor(Math.random()*(max-min+1)+min);
+}
+
+async function  getValidAttributes(table) {
   // récup les info sur la table pour obtenir les noms des colonnes
   /* const excludeID = `${table}_id`;  */
   const query = `
@@ -63,6 +66,12 @@ async function getValidAttributes(table) {
 async function SelectSQL(res, table, filteredAttributes) {
   let attr = filteredAttributes.join(', '); // Jointure des attributs
   let query = `SELECT ${attr}, ${table}_id FROM ${table}`;
+
+  if (table === "camion"){
+    query = `SELECT ${attr}, camion.camion_id FROM camion JOIN appartenir ON camion.camion_id =
+    appartenir.camion_id JOIN modele ON appartenir.modele_id = modele.modele_id JOIN marque 
+    ON modele.marque_id = marque.marque_id`;
+  }
 
   if (table === "livraison") {
     // Remplacement des colonnes spécifiques à livraison
@@ -139,10 +148,9 @@ async function SelectSQL(res, table, filteredAttributes) {
 }
 }
 
-// ajoute une entree dans une table
 async function AddSQL(req, res, tableName) {
   try {
-    const validAttributes = await getValidAttributes(tableName);  // Récupère les attributs valides de la table
+    const validAttributes = await getValidAttributes(tableName); // Récupère les attributs valides de la table
     console.log('Attributs valides:', validAttributes);
 
     const attributes = Object.keys(req.body);
@@ -158,28 +166,69 @@ async function AddSQL(req, res, tableName) {
       console.log('Erreur: Le nombre d\'attributs et de valeurs ne correspond pas.');
       return res.status(400).json({ error: 'Le nombre d\'attributs et de valeurs ne correspond pas.' });
     }
-
     // Construction de la requête d'insertion
     const attributesString = filteredAttributes.join(', ');
     const placeholders = filteredAttributes.map((_, index) => `$${index + 1}`).join(', ');
 
-    // Si la table est "APPARTENIR", on ne retourne pas un identifiant
-    if (tableName === 'appartenir' || tableName === 'conduire' || tableName === 'distance'|| tableName === 'contenir') {
+    if (tableName === 'camion') {
+      // Insertion dans la table camion
+      const camionQuery = `INSERT INTO camion (${attributesString}) VALUES (${placeholders}) RETURNING camion_id`;
+      const camionResult = await pool.query(camionQuery, filteredValues);
+
+      const camionId = camionResult.rows[0].camion_id;
+      console.log(`-SERVER: Camion ajouté avec succès, ID: ${camionId}`);
+
+      // Ajout à la table appartenir
+      const modeleId = req.body.modele;
+      if (!modeleId) {
+        console.log('Erreur: Aucun modèle fourni.');
+        return res.status(400).json({ error: 'Aucun modèle fourni pour le camion.' });
+      }
+
+      const appartenirQuery = `INSERT INTO appartenir (camion_id, modele_id) VALUES ($1, $2)`;
+      console.log(appartenirQuery);
+      await pool.query(appartenirQuery, [camionId, modeleId]);
+      console.log(`-SERVER: Association Camion-Modele ajoutée avec succès`);
+
+      return res.json({ message: 'Camion et association au modèle ajoutés avec succès', camion_id: camionId });
+    }
+
+    if (['appartenir', 'conduire', 'distance', 'contenir'].includes(tableName)) {
       const query = `INSERT INTO ${tableName} (${attributesString}) VALUES (${placeholders})`;
       console.log(query);
       await pool.query(query, filteredValues);
       console.log(`-SERVER: ${tableName.charAt(0).toUpperCase() + tableName.slice(1)} ajouté avec succès`);
       return res.json({ message: `${tableName.charAt(0).toUpperCase() + tableName.slice(1)} ajouté avec succès` });
     }
+    if (tableName === 'depot') {
+      const depotQueryInsert = `INSERT INTO depot (${attributesString}) VALUES (${placeholders}) RETURNING depot_id`;
+      const result = await pool.query(depotQueryInsert, filteredValues);
+      const depotId = result.rows[0].depot_id;
+    
+      console.log(`-SERVER: Dépôt ajouté avec succès, ID: ${depotId}`);
+    
+      const depotQuerySelect = 'SELECT depot_id FROM depot';
+      const resultSelect = await pool.query(depotQuerySelect);
+      const allDepots = resultSelect.rows;
+    
+      const queryInsertDistance = "INSERT INTO distance (depot1_id, depot2_id, distance) VALUES ($1, $2, $3)";
+    
+      for (const depot of allDepots) {
+        if (depot.depot_id !== depotId) {
+          const distance = randomNumber(500, 1000);
+          await pool.query(queryInsertDistance, [depotId, depot.depot_id, distance]);
+        }
+      }
+      console.log(`-SERVER: Association Depot-Distance ajoutée avec succès`);
+      return res.json({ message: 'Depot et association au modèle ajoutés avec succès', depotId: depotId });
+    }
 
     const query = `INSERT INTO ${tableName} (${attributesString}) VALUES (${placeholders}) RETURNING ${tableName}_id`;
-    console.log(query); 
+    console.log(query);
     const result = await pool.query(query, filteredValues);
-    console.log(result); 
 
-    // Utilisation de la clé dynamique pour accéder à l'ID
+    console.log(result);
     console.log(`-SERVER: ${tableName.charAt(0).toUpperCase() + tableName.slice(1)} ajouté avec succès, ID: ${result.rows[0][`${tableName}_id`]}`);
-    
     return res.json({ message: `${tableName.charAt(0).toUpperCase() + tableName.slice(1)} ajouté avec succès`, id: result.rows[0][`${tableName}_id`] });
   } catch (err) {
     console.error(`Erreur lors de l'ajout de ${tableName}:`, err);
@@ -187,6 +236,60 @@ async function AddSQL(req, res, tableName) {
   }
 }
 
+//DETAILS POUR PRODUITS
+app.post('/api/livraison/details', async (req, res) => {
+  const { id, table } = req.body;
+  try {
+      const query = `SELECT nom_produit, poids, quantite FROM livraison JOIN contenir 
+      ON livraison.livraison_id = contenir.livraison_id 
+      JOIN produit ON contenir.produit_id = produit.produit_id WHERE livraison.livraison_id = $1`;
+      console.log('Requête SQL générée:', query);
+      const result = await pool.query(query, [id]); 
+      console.log('Résultat de la requête:', result.rows);
+      res.json({data: result.rows}); 
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Erreur lors de la récupération des données' });
+  }
+});
+
+//DETAILS DES DISTANCES DEPOTS
+app.post('/api/depot/details', async (req, res) => {
+  const {id, table} = req.body;
+  try{
+    const query = `SELECT 
+    d2.intitule_depot AS autre_depot_nom,
+    d2.ville AS autre_depot_ville,
+    distance.distance AS distance_km
+FROM 
+    distance
+JOIN 
+    depot d2 ON (distance.depot2_id = d2.depot_id OR distance.depot1_id = d2.depot_id)
+WHERE 
+    (distance.depot1_id = $1 OR distance.depot2_id = $1)
+    AND d2.depot_id != $1`;
+    console.log('Requête SQL générée:', query);
+    const result = await pool.query(query, [id]);
+    console.log('Résultat de la requête:', result.rows);
+    res.json({data: result.rows});
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Erreur lors de la récupération des données' });
+  }
+});
+
+//AJOUTER DES PRODUITS À UNE LIVRAISON
+app.post('/api/livraison/addproduct', async (req, res) => {
+  const {idLivraison, produit_id, quantite} = req.body;
+  try {
+    const query = `INSERT INTO contenir (livraison_id, produit_id, quantite) VALUES ($1, $2, $3)`;
+    await pool.query(query, [idLivraison, produit_id, quantite]);
+    res.json({message: 'Produit ajouté avec succès à la livraison'});
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({error: 'Erreur lors de l\'ajout du produit à la livraison'});
+  }
+});
 
 
 // CHAUFFEURS
@@ -233,8 +336,13 @@ app.post('/api/camionGet', async (req, res) => {
 
   try {
     const validAttributes = await getValidAttributes(table);
-    const filteredAttributes = attributes.filter(attribute => validAttributes.includes(attribute));
-    
+    const filteredAttributes = attributes.filter(attribute => {
+      return (
+        attribute === 'nom_marque' || 
+        attribute === 'nom_modele' || 
+        validAttributes.includes(attribute)
+      );
+    });
     if (filteredAttributes.length === 0) {
       return res.status(400).json({ error: 'Aucun attribut valide sélectionné' });
     }
@@ -384,7 +492,7 @@ app.post('/api/produitAdd', async (req, res) => {
 
 app.get('/api/produit/ids', async (req, res) => {
   try {
-      const result = await pool.query('SELECT produit_id AS id FROM PRODUIT');
+      const result = await pool.query('SELECT produit_id AS id, nom_produit as nom, poids FROM PRODUIT');
       return res.json(result.rows);
   } catch (error) {
       console.error('Erreur dans /api/produit/ids:', error.message);
@@ -515,7 +623,7 @@ app.post('/api/modeleAdd', async (req, res) => {
 
 app.get('/api/modele/ids', async (req, res) => {
   try {
-      const result = await pool.query('SELECT modele_id AS id FROM modele');
+      const result = await pool.query('SELECT modele_id AS id, nom_modele as nom FROM modele');
       return res.json(result.rows);
   } catch (error) {
       console.error('Erreur dans /api/modele/ids:', error.message);
@@ -752,5 +860,166 @@ app.post('/api/execute-query', async (req, res) => {
       res.json(result.rows);
   } catch (error) {
       res.json({ error: error.message });
+  }
+});
+
+app.post('/api/specialrequests', async (req, res) => {
+  const { requestType, param } = req.body;
+
+  console.log("N°n de la requete spéciale :", req.body);
+
+  try {
+      let result;
+      switch (requestType) {
+          case "1": // Moyenne des poids transportés par camion par livraison
+              result = await pool.query(`
+                SELECT 
+    poids_par_livraison_par_camion.immatriculation,
+    AVG(total_poids) AS moyenne_poids_par_livraison
+FROM (
+    SELECT 
+        c.livraison_id,
+        ca.immatriculation,
+        SUM(c.quantite * p.poids) AS total_poids
+    FROM CONTENIR c
+    JOIN PRODUIT p ON c.produit_id = p.produit_id
+    JOIN LIVRAISON l ON c.livraison_id = l.livraison_id
+    JOIN CAMION ca ON l.camion_id = ca.camion_id
+    GROUP BY c.livraison_id, ca.immatriculation
+) AS poids_par_livraison_par_camion
+GROUP BY poids_par_livraison_par_camion.immatriculation;  
+                `);
+              break;
+
+          case "2": // Moyenne des distances parcourues par les chauffeurs pour effectuer une livraison
+              result = await pool.query(`
+                  SELECT c.nom_chauffeur, c.prenom_chauffeur,
+                         AVG(d.distance) AS moyenne_distance_par_livraison
+                  FROM LIVRAISON l
+                  JOIN chauffeur c ON l.chauffeur_id = c.chauffeur_id
+                  JOIN DISTANCE d ON (l.depot_depart_id = d.depot1_id AND l.depot_arrivee_id = d.depot2_id)
+                                 OR (l.depot_depart_id = d.depot2_id AND l.depot_arrivee_id = d.depot1_id)
+                  GROUP BY c.nom_chauffeur, c.prenom_chauffeur;
+              `);
+              break;
+
+          case "3": // Classement des chauffeurs
+              result = await pool.query(`
+                  SELECT ch.nom_chauffeur, 
+                         ch.prenom_chauffeur,
+                         FLOOR(pénalité_absence.total_jours_absence * 3.2 + pénalité_infraction.nombre_infractions * 5) AS note
+                  FROM CHAUFFEUR ch
+                  JOIN (
+                      SELECT a.chauffeur_id,
+                             SUM(EXTRACT(EPOCH FROM (date_fin::timestamp - date_debut::timestamp)) / 86400) AS total_jours_absence
+                      FROM ABSENCE a
+                      GROUP BY a.chauffeur_id
+                  ) pénalité_absence 
+                  ON pénalité_absence.chauffeur_id = ch.chauffeur_id
+                  JOIN (
+                      SELECT i.chauffeur_id,
+                             COUNT(i.infraction_id) AS nombre_infractions
+                      FROM INFRACTION i
+                      GROUP BY i.chauffeur_id
+                  ) pénalité_infraction
+                  ON pénalité_infraction.chauffeur_id = pénalité_absence.chauffeur_id
+                  ORDER BY note ASC;
+              `);
+              break;
+
+          case "4": // Classement des dépôts les plus proches d'une destination
+          result = await pool.query(`
+            SELECT 
+                source.intitule_depot AS depot_source_intitule,
+                source.ville AS depot_source_ville,
+                proche.intitule_depot AS depot_proche_intitule,
+                proche.ville AS depot_proche_ville,
+                distances.distance
+            FROM (
+                SELECT d.depot1_id AS depot_source,
+                       d.depot2_id AS depot_proche,
+                       d.distance
+                FROM DISTANCE d
+                WHERE d.depot1_id = '${param}'
+                UNION ALL
+                SELECT d.depot2_id AS depot_source,
+                       d.depot1_id AS depot_proche,
+                       d.distance
+                FROM DISTANCE d
+                WHERE d.depot2_id = '${param}'
+            ) AS distances
+            JOIN DEPOT source ON distances.depot_source = source.depot_id
+            JOIN DEPOT proche ON distances.depot_proche = proche.depot_id
+            ORDER BY distances.distance ASC;
+        `);
+        
+              break;
+
+          case "5": // Classement des camions vides les plus proches d’un dépôt
+              result = await pool.query(`
+                 WITH camions_vides_localisation AS (
+    SELECT DISTINCT ON (cv.camion_id)
+        cv.camion_id,
+        l.depot_arrivee_id
+    FROM (
+        SELECT c.camion_id
+        FROM CAMION c
+        WHERE c.camion_id NOT IN (
+            SELECT c.camion_id
+            FROM CAMION c
+            JOIN LIVRAISON l ON c.camion_id = l.camion_id
+            WHERE l.statut_livraison = 'En cours'
+        )
+    ) cv
+    JOIN LIVRAISON l ON cv.camion_id = l.camion_id
+    WHERE l.statut_livraison = 'Terminée'
+    ORDER BY cv.camion_id, l.date_effective_arrivee DESC
+),
+distances AS (
+    SELECT 
+        d.depot1_id AS depot_source_id,
+        d.depot2_id AS depot_target_id,
+        cl.camion_id AS camion_vide_id,
+        d.distance
+    FROM camions_vides_localisation cl
+    JOIN DISTANCE d ON cl.depot_arrivee_id = d.depot2_id
+    WHERE d.depot1_id = '${param}'
+    UNION ALL
+    SELECT 
+        d.depot2_id AS depot_source_id,
+        d.depot1_id AS depot_target_id,
+        cl.camion_id AS camion_vide_id,
+        d.distance
+    FROM camions_vides_localisation cl
+    JOIN DISTANCE d ON cl.depot_arrivee_id = d.depot1_id
+    WHERE d.depot2_id = '${param}'
+)
+SELECT 
+    ds.intitule_depot AS intitule_depot_source,
+    c.immatriculation AS immatriculation_camion,
+    d.distance
+FROM distances d
+JOIN DEPOT ds ON ds.depot_id = d.depot_source_id
+JOIN CAMION c ON c.camion_id = d.camion_vide_id
+ORDER BY d.distance ASC;
+
+              `);
+              break;
+
+          default:
+              res.status(400).json({ error: 'Type de requête non valide' });
+              return;
+      }
+
+      console.log(result.rows); 
+      if (!result) {
+          res.json({ success: true, data: [], message: 'Aucun résultat trouvé' });
+      } else {
+          res.json({ success: true, data: result.rows });
+      }
+
+  } catch (error) {
+      console.error('Erreur lors du traitement de la requête spéciale :', error);
+      res.status(500).json({ success: false, error: 'Erreur serveur' });
   }
 });
