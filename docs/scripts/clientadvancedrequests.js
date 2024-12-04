@@ -466,20 +466,9 @@ function generateTableHTMLAdvanced(attributes, results) {
             if (attribute === 'depot_depart_id') attribute = 'intitule_depot_depart';
             if (attribute === 'depot_arrivee_id') attribute = 'intitule_depot_arrivee';
             const value = entree[attribute.toString()] || '';
-            // Si c'est le statut de livraison, ajoute le select et le bouton
-            if (attribute === "statut_livraison") {
-                const selectId = `statut_livraison_${entree.livraison_id}`;
-                contentHTML += `
-                    <p class="attribut statut-container">
-                        <select class="attribut selectlivraisonstate" name='statut_livraison' id='${selectId}' data-livraison-id='${entree.livraison_id}'>
-                            <option value='En attente' ${entree.statut_livraison === 'En attente' ? 'selected' : ''}>En attente</option>
-                            <option value='En cours' ${entree.statut_livraison === 'En cours' ? 'selected' : ''}>En cours</option>
-                            <option value='Terminée' ${entree.statut_livraison === 'Terminée' ? 'selected' : ''}>Terminée</option>
-                        </select>
-                    </p>`;
-            } else {
+           
                 contentHTML += `<p class='attribut'>${value}</p>`;  
-            }
+            
         });
         
         
